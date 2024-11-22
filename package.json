@@ -6,7 +6,6 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsup",
-    "publish": "pnpm build --env.publish",
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
