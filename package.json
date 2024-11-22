@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsup",
+    "build:publish": "pnpm build --env.publish",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev --env.publish"
