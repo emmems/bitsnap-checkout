@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import zod from "zod";
 import CartComponent from "./CartComponent";
-import { getCheckoutMethods, getProjectID } from "./CartProvider";
+import { getCheckoutMethods, getProjectID, setProjectID } from "./CartProvider";
 import { isErr } from "./lib/err";
 
 enum CartEvent {
@@ -17,7 +17,8 @@ const cartAddToCartSchema = zod.object({
 
 type CartAddToCartEvent = zod.infer<typeof cartAddToCartSchema>;
 
-function BitsnapCart({ children, onVisibleChange, className }: { children?: React.ReactNode; onVisibleChange?: (isVisible: boolean) => void; className?: string }) {
+function BitsnapCart({ projectID, children, onVisibleChange, className }: { projectID: string; children?: React.ReactNode; onVisibleChange?: (isVisible: boolean) => void; className?: string }) {
+
     const [isCartVisible, setIsCartVisible] = useState(false)
 
     function sentPostMessageToIframe(msg: unknown) {
@@ -31,6 +32,10 @@ function BitsnapCart({ children, onVisibleChange, className }: { children?: Reac
   useEffect(() => {
     onVisibleChange?.(isCartVisible);
   }, [isCartVisible]);
+
+  useEffect(() => {
+    setProjectID(projectID);
+  }, [projectID]);
 
     useEffect(() => {
         if (!('cart' in window)) {

@@ -46,7 +46,15 @@ const CartProviderContext = createContext<
     | CartMethods
     | undefined>(undefined)
 
+export var bitsnapProjectID: string | undefined = undefined;
+export function setProjectID(projectID: string) {
+    bitsnapProjectID = projectID;
+}
+
 export function getProjectID(): string | undefined {
+    if (bitsnapProjectID != null) {
+      return bitsnapProjectID
+    }
     const me = document.querySelector('script[data-id][data-name="internal-cart"]');
     const projectID = me?.getAttribute('data-id');
     return projectID ?? undefined;
