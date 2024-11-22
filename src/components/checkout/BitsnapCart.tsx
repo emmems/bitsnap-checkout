@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import zod from "zod";
 import CartComponent from "./CartComponent";
 import { getCheckoutMethods, getProjectID, setProjectID } from "./CartProvider";
 import { isErr } from "./lib/err";
+import { useCheckoutStore } from './state';
 
 enum CartEvent {
     ADD_TO_CART = 'ADD_TO_CART',
@@ -18,8 +19,7 @@ const cartAddToCartSchema = zod.object({
 type CartAddToCartEvent = zod.infer<typeof cartAddToCartSchema>;
 
 function BitsnapCart({ projectID, children, onVisibleChange, className }: { projectID: string; children?: React.ReactNode; onVisibleChange?: (isVisible: boolean) => void; className?: string }) {
-
-    const [isCartVisible, setIsCartVisible] = useState(false)
+  const { isCartVisible, showCart, hideCart } = useCheckoutStore();
 
     function sentPostMessageToIframe(msg: unknown) {
         const iframes = document.querySelectorAll('iframe');
@@ -104,7 +104,7 @@ function BitsnapCart({ projectID, children, onVisibleChange, className }: { proj
                 type: CartEvent.ADD_TO_CART,
                 success: true,
             });
-            setIsCartVisible(true);
+          showCart();
 
         } catch (e) {
             console.warn('cannot add item to cart', e);
@@ -141,14 +141,14 @@ function BitsnapCart({ projectID, children, onVisibleChange, className }: { proj
 
     return (
         <>
-          <button onClick={() => setIsCartVisible(!isCartVisible)} className={className ?? 'ics-rounded-full hover:ics-bg-neutral-300 ics-transition ics-p-1'}>
+          <button onClick={() => isCartVisible ? hideCart() : showCart()} className={className ?? 'ics-rounded-full hover:ics-bg-neutral-300 ics-transition ics-p-1'}>
           { children ? (
             <>
               {children}
             </>
           ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                      className="lucide lucide-shopping-cart">
                     <circle cx="8" cy="21" r="1"/>
                     <circle cx="19" cy="21" r="1"/>
@@ -157,7 +157,7 @@ function BitsnapCart({ projectID, children, onVisibleChange, className }: { proj
                 )}
             </button>
             <CartComponent isVisible={isCartVisible} shouldHide={() => {
-                setIsCartVisible(false)
+              hideCart();
             }}
             />
         </>

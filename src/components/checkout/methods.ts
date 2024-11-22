@@ -1,4 +1,5 @@
 import { getCheckoutMethods, getProjectID } from "./CartProvider";
+import { useCheckoutStore } from "./state";
 
 
 export async function addProductToCart(id: string, quantity: number = 1, metadata?: Record<string, string | undefined>) {
@@ -18,4 +19,12 @@ export async function addProductToCart(id: string, quantity: number = 1, metadat
     return err
   }
   return undefined;
+}
+
+export function showCart() {
+  useCheckoutStore.setState({ isCartVisible: true });
+}
+
+export function hideCart() {
+  useCheckoutStore.setState({ isCartVisible: false });
 }
