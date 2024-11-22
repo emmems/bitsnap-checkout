@@ -12,7 +12,6 @@ function CartComponent({isVisible, shouldHide}: Props) {
     const [parent] = useAutoAnimate(/* optional config */)
 
 
-  console.log('isVisible', isVisible);
     return (
         <div ref={parent} className={'ics-z-[999999]'}>
             {isVisible && (
@@ -46,7 +45,6 @@ const WrapperCartComponent = (props: Props) => {
       return null;
   }
 
-  console.log('hey!', document, window);
     return createPortal((
         <CartProvider>
             <CartComponent {...props} />
