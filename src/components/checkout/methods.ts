@@ -105,8 +105,8 @@ export async function createCheckout(
   };
 
   const path = request.testMode
-    ? `/payment/link/auto/${projectID}/test`
-    : `/payment/link/auto/${projectID}`;
+    ? `/api/payment/link/auto/${projectID}/test`
+    : `/api/payment/link/auto/${projectID}`;
 
   delete request.apiKey;
   delete request.testMode;

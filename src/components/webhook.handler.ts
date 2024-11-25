@@ -1,5 +1,9 @@
+import { fromJson } from "@bufbuild/protobuf";
 import crypto from "crypto";
-import { IntegrationEventJob } from "src/gen/proto/jobs/v1/integration_event_job_pb";
+import {
+  type IntegrationEventJob,
+  IntegrationEventJobSchema,
+} from "src/gen/proto/jobs/v1/integration_event_job_pb";
 import { Err } from "./checkout/lib/err";
 
 export async function handleWebhook(
@@ -37,7 +41,7 @@ export async function handleWebhookSignature(
   }
 
   return {
-    ...IntegrationEventJob.fromJson(payload),
+    ...fromJson(IntegrationEventJobSchema, payload),
     isErr: false,
   };
 }
