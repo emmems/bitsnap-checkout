@@ -1,6 +1,6 @@
 {
   "name": "bitsnap-checkout",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "This is Bitsnap Checkout React library for easy integration with any website which is using React framework",
   "main": "index.ts",
   "type": "commonjs",
@@ -22,6 +22,7 @@
     "url": "https://github.com/emmems/bitsnap-checkout/issues"
   },
   "files": ["dist", "internal", "errors", "backend"],
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/emmems/bitsnap-checkout#readme",
   "devDependencies": {
     "@types/react": "^18.3.12",
