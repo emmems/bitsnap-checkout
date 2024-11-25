@@ -9,14 +9,11 @@ export async function handleWebhook(
   headers: Record<string, string | undefined>,
   /// webhook secret from admin panel
   secret: string,
-): Promise<Err | IntegrationEventJob> {
+) {
   const signature =
     headers?.["x-content-signature"] ?? headers?.["X-Content-Signature"];
-  if (signature == null) {
-    return Err("Missing signature", "badInput");
-  }
 
-  return handleWebhookSignature(payload, signature, secret);
+  return handleWebhookSignature(payload, signature ?? "", secret);
 }
 
 export async function handleWebhookSignature(
@@ -26,15 +23,25 @@ export async function handleWebhookSignature(
   signature: Record<string, string> | string,
   /// webhook secret from admin panel
   secret: string,
-): Promise<Err | IntegrationEventJob> {
+): Promise<ReturnType> {
   // Validate hmac512 signature
   const hmac = crypto.createHmac("sha512", secret);
   hmac.update(payload);
   const calculatedSignature = hmac.digest("hex");
 
   if (signature != calculatedSignature) {
-    return Err("Invalid signature", "badInput");
+    return {
+      ...Err("Invalid signature", "badInput"),
+      isErr: true,
+    };
   }
 
-  return IntegrationEventJob.fromJson(payload);
+  return {
+    ...IntegrationEventJob.fromJson(payload),
+    isErr: false,
+  };
 }
+
+type ReturnType =
+  | (Err & { isErr: true })
+  | (IntegrationEventJob & { isErr: false });
