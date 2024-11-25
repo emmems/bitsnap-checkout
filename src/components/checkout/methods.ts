@@ -1,4 +1,5 @@
 import { getCheckoutMethods, getProjectID } from "./CartProvider";
+import { HOST } from "./constants";
 import { buildURL } from "./helper.methods";
 import { Err } from "./lib/err";
 import { LinkRequest } from "./link.request.schema";
@@ -85,5 +86,43 @@ export async function createPaymentURL(request: LinkRequest) {
 
   return {
     url: response.url,
+  };
+}
+
+export async function createCheckout(
+  request: LinkRequest & { apiKey?: string; testMode?: boolean },
+) {
+  const projectID = getProjectID();
+  if (projectID == null) {
+    throw new Error("No project ID found");
+  }
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(request.apiKey != null
+      ? { Authorization: `Bearer ${request.apiKey}` }
+      : {}),
+  };
+
+  const path = request.testMode
+    ? `/payment/link/auto/${projectID}/test`
+    : `/payment/link/auto/${projectID}`;
+
+  delete request.apiKey;
+  delete request.testMode;
+
+  const response = await fetch(HOST + path, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(request),
+  });
+
+  const payload: {
+    url: string;
+  } = await response.json();
+
+  return {
+    status: "ok",
+    redirectURL: payload.url,
   };
 }
