@@ -1,8 +1,10 @@
 import { createContext, useContext } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import zod from "zod";
-import { Err } from "./lib/err";
+import { buildURL } from "./helper.methods";
+import { Err, isErr } from "./lib/err";
 import { LinkRequest } from "./link.request.schema";
+import { createPaymentURL } from "./methods";
 import { SingleProduct } from "./product.details.model";
 
 export const MARKETING_AGREEMENT_ID = '__m_a';
@@ -132,10 +134,6 @@ function getCheckout(): Checkout {
 
 function saveCheckout(model: Checkout) {
     localStorage.setItem(checkoutKey, JSON.stringify(model));
-}
-
-function buildURL(projectID: string, path: string): string {
-    return `${host}/api/integrations/${projectID}/public-commerce${path}`;
 }
 
 export const getCheckoutMethods: (projectID: string) => CartMethods = (projectID) => {
@@ -305,24 +303,16 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (projectID
                 metadata: mergedMetadata,
             }
 
-            const result = await fetch(buildURL(projectID, '/buy'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+          const paymentResponse = await createPaymentURL(payload);
 
-            if (result.status != 200) {
-                console.warn('result', await result.text(), result.status, result.statusText);
-                return Err('internal-error', 'internal');
-            }
+          if (isErr(paymentResponse)) {
+            console.warn('cannot create payment URL', paymentResponse.error);
+            return paymentResponse;
+          }
 
-            const response: { url: string; sessionID: string; } = await result.json();
-
-            return {
-                url: response.url,
-            }
+          return {
+              url: paymentResponse.url,
+          }
         },
 
         async justRedirectToPayment(args: {
