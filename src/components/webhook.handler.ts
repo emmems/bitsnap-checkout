@@ -9,13 +9,19 @@ import { Err } from "./checkout/lib/err";
 export async function handleWebhook(
   /// utf-8 encoded json string
   payload: string,
+  // url of the webhook can contain signature in query params under key "sig"
+  url: string,
   /// Headers or Signature X-Content-Signature
   headers: Record<string, string | undefined>,
   /// webhook secret from admin panel
   secret: string,
 ) {
-  const signature =
+  let signature =
     headers?.["x-content-signature"] ?? headers?.["X-Content-Signature"];
+  if (signature == null) {
+    const parsedUrl = new URL(url);
+    signature = parsedUrl.searchParams.get("sig") ?? undefined;
+  }
 
   return handleWebhookSignature(payload, signature ?? "", secret);
 }
@@ -24,7 +30,7 @@ export async function handleWebhookSignature(
   /// utf-8 encoded json string
   payload: string,
   /// Signature X-Content-Signature
-  signature: Record<string, string> | string,
+  signature: string,
   /// webhook secret from admin panel
   secret: string,
 ): Promise<ReturnType> {
@@ -41,7 +47,7 @@ export async function handleWebhookSignature(
   }
 
   return {
-    ...fromJson(IntegrationEventJobSchema, payload),
+    ...fromJson(IntegrationEventJobSchema, JSON.parse(payload)),
     isErr: false,
   };
 }

@@ -1,2 +1,5 @@
+export let HOST = "https://bitsnap.pl";
 
-export const HOST = 'https://bitsnap.pl';
+export function setCustomHost(host: string) {
+  HOST = host;
+}
