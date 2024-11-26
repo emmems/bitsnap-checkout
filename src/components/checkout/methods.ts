@@ -108,7 +108,6 @@ export async function createCheckout(
     ? `/api/payment/link/auto/${projectID}/test`
     : `/api/payment/link/auto/${projectID}`;
 
-  alert(path);
   delete request.apiKey;
   delete request.testMode;
 
