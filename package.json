@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/emmems/bitsnap-checkout/issues"
   },
-  "files": ["dist", "internal", "errors"],
+  "files": ["dist", "internal", "errors", "backend"],
   "homepage": "https://github.com/emmems/bitsnap-checkout#readme",
   "devDependencies": {
     "@types/react": "^18.3.12",
@@ -53,6 +53,26 @@
       "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      }
+    },
+    "./backend": {
+      "import": {
+        "types": "./dist/backend.d.mts",
+        "default": "./dist/backend.mjs"
+      },
+      "require": {
+        "types": "./dist/backend.d.ts",
+        "default": "./dist/backend.js"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./dist/models.d.mts",
+        "default": "./dist/models.mjs"
+      },
+      "require": {
+        "types": "./dist/models.d.ts",
+        "default": "./dist/models.js"
       }
     },
     "./internal": {
