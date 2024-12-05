@@ -7,7 +7,11 @@ export namespace BitsnapBackend {
     BACKEND_HOST = host;
   }
 
-  export async function getProduct(projectID: string, id: string) {
+  export async function getProduct(
+    projectID: string,
+    id: string,
+    requestInit?: RequestInit,
+  ) {
     const payload = {
       "0": {
         projectID: projectID,
@@ -24,7 +28,9 @@ export namespace BitsnapBackend {
         "/api/trpc/product.getProductById?" +
         encodedPayload.toString(),
       {
+        ...(requestInit ?? {}),
         headers: {
+          ...(requestInit?.headers ?? {}),
           "Content-Type": "application/json",
           Priority: "u=3, i",
         },
@@ -48,6 +54,7 @@ export namespace BitsnapBackend {
     projectID: string,
     limit: number,
     offset: number,
+    requestInit?: RequestInit,
   ) {
     const productsPayload = {
       "0": {
@@ -65,7 +72,9 @@ export namespace BitsnapBackend {
         "/api/trpc/product.getProductGrid?" +
         encodedPayload.toString(),
       {
+        ...(requestInit ?? {}),
         headers: {
+          ...(requestInit?.headers ?? {}),
           "Content-Type": "application/json",
           Priority: "u=3, i",
         },
