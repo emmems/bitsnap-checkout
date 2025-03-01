@@ -73,6 +73,7 @@ function BitsnapCart({
 
             const result = await methods.justRedirectToPayment(payload);
 
+            console.log("result", result);
             if (isErr(result) == false) {
               window.location.href = result.url;
             } else {

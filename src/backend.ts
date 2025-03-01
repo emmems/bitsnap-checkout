@@ -23,6 +23,8 @@ export namespace BitsnapBackend {
     encodedPayload.set("batch", "1");
     encodedPayload.set("input", JSON.stringify(payload));
 
+    console.log("ta funkcja się odpala", BACKEND_HOST);
+    const now = performance.now();
     const result = await fetch(
       BACKEND_HOST +
         "/api/trpc/product.getProductById?" +
@@ -36,6 +38,7 @@ export namespace BitsnapBackend {
         },
       },
     );
+    console.log("zapytanie zakończone", performance.now() - now);
 
     const downloadedPayload = await result.json();
 
@@ -82,6 +85,8 @@ export namespace BitsnapBackend {
     );
 
     const downloadedPayload = await result.json();
+
+    console.log(downloadedPayload);
 
     const parsedResult =
       await BitsnapModels.ProductsResultElementSchema.parseAsync(

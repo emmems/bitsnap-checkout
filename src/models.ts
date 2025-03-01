@@ -2,7 +2,7 @@ import * as z from "zod";
 
 export namespace BitsnapModels {
   export const BaselinkerFieldsSchema = z.object({
-    storageID: z.string(),
+    storageID: z.string().optional(),
   });
   export type BaselinkerFields = z.infer<typeof BaselinkerFieldsSchema>;
 
@@ -13,35 +13,34 @@ export namespace BitsnapModels {
     name: z.string(),
     price: z.number(),
     currency: z.string(),
-    metadata: MetadataSchema,
+    metadata: MetadataSchema.optional(),
     images: z.array(z.string()),
     availableQuantity: z.number(),
   });
   export type Variant = z.infer<typeof VariantSchema>;
 
   export const AdditionalSchema = z.object({
-    sku: z.string(),
-    baselinkerFields: BaselinkerFieldsSchema,
+    sku: z.string().optional(),
+    baselinkerFields: BaselinkerFieldsSchema.optional(),
   });
   export type Additional = z.infer<typeof AdditionalSchema>;
 
   export const ItemSchema = z.object({
     id: z.string(),
-    ownerID: z.string(),
+    ownerID: z.string().optional(),
     name: z.string(),
     description: z.union([z.string(), z.null()]).optional(),
-    createdAt: z.number(),
-    updatedAt: z.number(),
+    createdAt: z.number().optional(),
+    updatedAt: z.number().optional(),
     price: z.number(),
     currency: z.string(),
-    metadata: MetadataSchema,
+    metadata: MetadataSchema.optional(),
     image_url: z.string(),
     images: z.array(z.string()),
-    isDeliverable: z.boolean(),
-    availableQuantity: z.number(),
-    additional: AdditionalSchema,
-    deletedAt: z.null(),
-    variants: z.array(VariantSchema),
+    isDeliverable: z.boolean().optional(),
+    availableQuantity: z.number().optional(),
+    additional: AdditionalSchema.optional(),
+    variants: z.array(VariantSchema).optional(),
   });
   export type Item = z.infer<typeof ItemSchema>;
 

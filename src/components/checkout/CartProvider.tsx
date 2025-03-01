@@ -411,6 +411,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         },
         body: JSON.stringify(payload),
       });
+      console.log("CODE", result.status);
 
       if (result.status != 200) {
         console.warn(
@@ -424,6 +425,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
 
       const response: { url: string; sessionID: string } = await result.json();
 
+      console.log(response.url);
       return {
         url: response.url,
       };
