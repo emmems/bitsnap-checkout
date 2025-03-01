@@ -5,7 +5,7 @@ import { setCustomHost } from "./constants";
 import { buildURL } from "./helper.methods";
 import { Err, isErr } from "./lib/err";
 import { LinkRequest } from "./link.request.schema";
-import { createPaymentURL } from "./methods";
+import { createPaymentURL, injectReferenceToRequestIfNeeded } from "./methods";
 import { SingleProduct } from "./product.details.model";
 
 export const MARKETING_AGREEMENT_ID = "__m_a";
@@ -362,7 +362,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       country?: string;
       marketingAgreement?: boolean;
     }): Promise<Err | { url: string }> {
-      const payload: LinkRequest = {
+      let payload: LinkRequest = {
         items: [
           {
             id: args.productID,
@@ -378,6 +378,8 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
               }
             : undefined,
       };
+
+      payload = injectReferenceToRequestIfNeeded(payload);
 
       if (args.country == null) {
         args.country = "pl";

@@ -64,6 +64,8 @@ export async function createPaymentURL(request: LinkRequest) {
     throw new Error("No project ID found");
   }
 
+  request = injectReferenceToRequestIfNeeded(request);
+
   const result = await fetch(buildURL(projectID, "/buy"), {
     method: "POST",
     headers: {
@@ -125,4 +127,30 @@ export async function createCheckout(
     status: "ok",
     redirectURL: payload.url,
   };
+}
+
+function getReferenceIfPossible(): string | undefined {
+  if (typeof localStorage == "undefined") {
+    return undefined;
+  }
+  const refLink = localStorage.getItem("bitsnap-ref");
+  if (refLink == null) {
+    return undefined;
+  }
+  return refLink;
+}
+
+export function injectReferenceToRequestIfNeeded(
+  request: LinkRequest,
+): LinkRequest {
+  const ref = getReferenceIfPossible();
+  if (ref == null) {
+    return request;
+  }
+
+  if (request.metadata == null) {
+    request.metadata = {};
+  }
+  request.metadata["ref"] = ref;
+  return request;
 }
