@@ -162,7 +162,8 @@ function BitsnapCart({
     if (typeof window !== "undefined") {
       try {
         const parsedParams = new URLSearchParams(window.location.search);
-        const refLink = parsedParams.get("ref");
+        const refLink =
+          parsedParams.get("ref") ?? parsedParams.get("utm-source");
         if (
           typeof localStorage != "undefined" &&
           refLink &&
