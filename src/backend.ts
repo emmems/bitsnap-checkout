@@ -126,7 +126,7 @@ export namespace BitsnapBackend {
     );
 
     if (result.status != 200) {
-      console.warn('error while sending notification', await result.text());
+      console.warn('error while sending notification', result.status, await result.text());
       return 'failure';
     }
     return 'success';
