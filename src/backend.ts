@@ -115,6 +115,7 @@ export namespace BitsnapBackend {
         "/api/notification/send",
       {
         ...(requestInit ?? {}),
+        method: 'POST',
         body: JSON.stringify(request),
         headers: {
           ...(requestInit?.headers ?? {}),
