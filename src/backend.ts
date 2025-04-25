@@ -133,12 +133,14 @@ export namespace BitsnapBackend {
   }
 }
 
+const notificationTypes = zod.enum(['push', 'email', 'sms']);
+
 const notificationRequestSchema = zod
   .object({
     to: zod.array(zod.string()),
     title: zod.string(),
     body: zod.string().optional(),
-    type: zod.enum(['push', 'email', 'sms']).default('push'),
+    type: zod.union([notificationTypes, zod.array(notificationTypes)]).default('push'),
     emailOptions: zod.object({
       subject: zod.string().optional(),
       replyTo: zod.string().optional(),
