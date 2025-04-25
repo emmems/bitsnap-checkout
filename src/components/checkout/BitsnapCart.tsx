@@ -13,7 +13,7 @@ const cartAddToCartSchema = zod.object({
   id: zod.string(),
   isSubscription: zod.boolean().default(false),
   quantity: zod.number(),
-  metadata: zod.record(zod.string().optional()).optional(),
+  metadata: zod.record(zod.string(), zod.string().optional()).optional(),
 });
 
 type CartAddToCartEvent = zod.infer<typeof cartAddToCartSchema>;

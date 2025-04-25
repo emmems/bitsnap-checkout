@@ -121,7 +121,7 @@ const checkoutSchema = zod.object({
         id: zod.string(),
         productID: zod.string(),
         quantity: zod.number(),
-        metadata: zod.record(zod.string().optional()).optional(),
+        metadata: zod.record(zod.string(), zod.string().optional()).optional(),
       }),
     )
     .optional(),

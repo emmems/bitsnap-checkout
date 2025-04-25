@@ -91,7 +91,7 @@ export const linkRequestSchema = zod.object({
             }).optional()
         })
     ),
-    metadata: zod.record(zod.string()).optional(),
+    metadata: zod.record(zod.string(), zod.string()).optional(),
 
     additionalAgreements: zod.array(agreementSchema).optional(),
 
