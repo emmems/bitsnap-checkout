@@ -1,4 +1,4 @@
-import zod from 'zod';
+import zod from "zod";
 import { BitsnapModels } from "./models";
 
 let BACKEND_HOST = "https://bitsnap.pl";
@@ -63,14 +63,24 @@ export namespace BitsnapBackend {
     limit: number,
     offset: number,
     requestInit?: RequestInit,
+    opts?: {
+      groupVariants?: boolean;
+    },
   ) {
-    const productsPayload = {
+    const productsPayload: { [key: string]: any } = {
       "0": {
         projectID: projectID,
         limit: limit,
         offset: offset,
       },
     };
+
+    if (opts) {
+      if (opts.groupVariants != null) {
+        productsPayload[0]["groupVariants"] = opts.groupVariants;
+      }
+    }
+
     const encodedPayload = new URLSearchParams();
     encodedPayload.set("batch", "1");
     encodedPayload.set("input", JSON.stringify(productsPayload));
@@ -106,46 +116,54 @@ export namespace BitsnapBackend {
     return parsed.result;
   }
 
-  export async function sendNotification(request: NotificationRequest, requestInit?: RequestInit) {
-    if (API_KEY == null || API_KEY == '') {
-      throw new Error('use BitsnapBackend.setApiKey("{{API_KEY}} to setup api key before using this method.")')
+  export async function sendNotification(
+    request: NotificationRequest,
+    requestInit?: RequestInit,
+  ) {
+    if (API_KEY == null || API_KEY == "") {
+      throw new Error(
+        'use BitsnapBackend.setApiKey("{{API_KEY}} to setup api key before using this method.")',
+      );
     }
-    const result = await fetch(
-      BACKEND_HOST +
-        "/api/notification/send",
-      {
-        ...(requestInit ?? {}),
-        method: 'POST',
-        body: JSON.stringify(request),
-        headers: {
-          ...(requestInit?.headers ?? {}),
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer ' + API_KEY,
-        },
+    const result = await fetch(BACKEND_HOST + "/api/notification/send", {
+      ...(requestInit ?? {}),
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        ...(requestInit?.headers ?? {}),
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + API_KEY,
       },
-    );
+    });
 
     if (result.status != 200) {
-      console.warn('error while sending notification', result.status, await result.text());
-      return 'failure';
+      console.warn(
+        "error while sending notification",
+        result.status,
+        await result.text(),
+      );
+      return "failure";
     }
-    return 'success';
+    return "success";
   }
 }
 
-const notificationTypes = zod.enum(['push', 'email', 'sms']);
+const notificationTypes = zod.enum(["push", "email", "sms"]);
 
-const notificationRequestSchema = zod
-  .object({
-    to: zod.array(zod.string()),
-    title: zod.string(),
-    body: zod.string().optional(),
-    type: zod.union([notificationTypes, zod.array(notificationTypes)]).default('push'),
-    emailOptions: zod.object({
+const notificationRequestSchema = zod.object({
+  to: zod.array(zod.string()),
+  title: zod.string(),
+  body: zod.string().optional(),
+  type: zod
+    .union([notificationTypes, zod.array(notificationTypes)])
+    .default("push"),
+  emailOptions: zod
+    .object({
       subject: zod.string().optional(),
       replyTo: zod.string().optional(),
 
       htmlText: zod.string().optional(),
-    }).optional(),
-  });
+    })
+    .optional(),
+});
 export type NotificationRequest = zod.infer<typeof notificationRequestSchema>;
