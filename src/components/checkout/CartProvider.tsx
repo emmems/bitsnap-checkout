@@ -251,13 +251,30 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       products.forEach((product) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        product["details"] = payload.result?.find(
-          (el) => el.id === product.productID,
-        );
+        product["details"] = payload.result?.find((el) => {
+          if (el.id === product.productID) {
+            return true;
+          }
+          if (el.variants != null && el.variants.length > 0) {
+            const index = el.variants.findIndex(
+              (variant) => variant.id === product.productID,
+            );
+            return index !== -1;
+          }
+          return false;
+        });
       });
 
       // @ts-ignore
-      return products.filter((el) => "details" in el);
+      return products
+        .filter((el) => "details" in el)
+        .map((el) => {
+          el.details = resolveProductDetailsFromSingleProduct(
+            el.productID,
+            el.details as SingleProduct,
+          );
+          return el;
+        });
     },
 
     async removeProductFromCart(args: { id: string }): Promise<Err | void> {
@@ -432,3 +449,29 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     },
   };
 };
+
+function resolveProductDetailsFromSingleProduct(
+  id: string,
+  product: SingleProduct,
+) {
+  if (id == product.id) {
+    return product;
+  }
+
+  const variant = product.variants?.find((v) => v.id === id);
+  if (variant == null) {
+    return product;
+  }
+
+  return {
+    ...product,
+    id: variant.id,
+    name: product.name + " " + variant.name,
+    price: variant.price,
+    currency: variant.currency,
+    metadata: product.metadata,
+    availableQuantity: variant.availableQuantity,
+    isDeliverable: variant.isDeliverable,
+    images: variant.images ?? product.images,
+  };
+}
