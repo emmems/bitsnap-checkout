@@ -15,13 +15,23 @@
     "type": "git",
     "url": "git+https://github.com/emmems/bitsnap-checkout.git"
   },
-  "keywords": ["bitsnap", "checkout", "shop", "ecommerce"],
+  "keywords": [
+    "bitsnap",
+    "checkout",
+    "shop",
+    "ecommerce"
+  ],
   "author": "Piotr Michalik",
   "license": "SEE LICENSE IN LICENSE file",
   "bugs": {
     "url": "https://github.com/emmems/bitsnap-checkout/issues"
   },
-  "files": ["dist", "internal", "errors", "backend"],
+  "files": [
+    "dist",
+    "internal",
+    "errors",
+    "backend"
+  ],
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/emmems/bitsnap-checkout#readme",
   "devDependencies": {
@@ -34,6 +44,9 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2",
+    "@connectrpc/connect": "^2.0.4",
+    "@connectrpc/connect-node": "^2.0.4",
+    "@connectrpc/connect-query": "^2.1.1",
     "@formkit/auto-animate": "^0.8.2",
     "framer-motion": "^11.11.17",
     "react": "^18.3.1",

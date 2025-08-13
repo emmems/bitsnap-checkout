@@ -1,5 +1,11 @@
+import { create } from "@bufbuild/protobuf";
 import zod from "zod";
+import {
+  NotifyUserAboutProductAvailabilityRequest,
+  NotifyUserAboutProductAvailabilityRequestSchema,
+} from "./gen/proto/public/v1/public_api_pb";
 import { BitsnapModels } from "./models";
+import { PublicApiClient } from "./public.api.client";
 
 let BACKEND_HOST = "https://bitsnap.pl";
 let API_KEY: string | undefined;
@@ -7,6 +13,9 @@ let API_KEY: string | undefined;
 export namespace BitsnapBackend {
   export async function setCustomHost(host: string) {
     BACKEND_HOST = host;
+  }
+  export function getHost() {
+    return BACKEND_HOST;
   }
   export async function setApiKey(apiKey: string) {
     API_KEY = apiKey;
@@ -28,8 +37,6 @@ export namespace BitsnapBackend {
     encodedPayload.set("batch", "1");
     encodedPayload.set("input", JSON.stringify(payload));
 
-    console.log("ta funkcja się odpala", BACKEND_HOST);
-    const now = performance.now();
     const result = await fetch(
       BACKEND_HOST +
         "/api/trpc/product.getProductById?" +
@@ -43,7 +50,6 @@ export namespace BitsnapBackend {
         },
       },
     );
-    console.log("zapytanie zakończone", performance.now() - now);
 
     const downloadedPayload = await result.json();
 
@@ -145,6 +151,42 @@ export namespace BitsnapBackend {
       return "failure";
     }
     return "success";
+  }
+
+  export async function notifyProductAvailability(
+    request: Pick<
+      NotifyUserAboutProductAvailabilityRequest,
+      "productId" | "email" | "projectId"
+    >,
+    opts?: {
+      headers?: Headers;
+      signal?: AbortSignal;
+      timeoutMs?: number;
+    },
+  ): Promise<{
+    status: "success" | "failure";
+    message?: "failed-to-notify";
+  }> {
+    const req = create(NotifyUserAboutProductAvailabilityRequestSchema, {
+      productId: request.productId,
+      email: request.email,
+      projectId: request.projectId,
+    });
+
+    try {
+      await PublicApiClient.get(
+        BACKEND_HOST,
+      ).notifyUserAboutProductAvailability(req, opts);
+      return {
+        status: "success",
+      };
+    } catch (e: any) {
+      console.log("error while sending notification", e);
+      return {
+        status: "failure",
+        message: "failed-to-notify",
+      };
+    }
   }
 }
 
