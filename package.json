@@ -1,6 +1,6 @@
 {
   "name": "bitsnap-checkout",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "This is Bitsnap Checkout React library for easy integration with any website which is using React framework",
   "main": "index.ts",
   "type": "commonjs",
@@ -15,23 +15,13 @@
     "type": "git",
     "url": "git+https://github.com/emmems/bitsnap-checkout.git"
   },
-  "keywords": [
-    "bitsnap",
-    "checkout",
-    "shop",
-    "ecommerce"
-  ],
+  "keywords": ["bitsnap", "checkout", "shop", "ecommerce"],
   "author": "Piotr Michalik",
   "license": "SEE LICENSE IN LICENSE file",
   "bugs": {
     "url": "https://github.com/emmems/bitsnap-checkout/issues"
   },
-  "files": [
-    "dist",
-    "internal",
-    "errors",
-    "backend"
-  ],
+  "files": ["dist", "internal", "errors", "backend"],
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/emmems/bitsnap-checkout#readme",
   "devDependencies": {
