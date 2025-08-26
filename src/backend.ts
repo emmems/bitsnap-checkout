@@ -207,5 +207,11 @@ const notificationRequestSchema = zod.object({
       htmlText: zod.string().optional(),
     })
     .optional(),
+  advanced: zod
+    .object({
+      /// This is a boolean flag that indicates whether the notification should be shown in the dashboard. DEFAULT: true.
+      showInDashboard: zod.boolean().default(false),
+    })
+    .optional(),
 });
 export type NotificationRequest = zod.infer<typeof notificationRequestSchema>;
