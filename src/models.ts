@@ -16,12 +16,15 @@ export namespace BitsnapModels {
     metadata: MetadataSchema.optional(),
     images: z.array(z.string()),
     availableQuantity: z.number(),
+    isDeliverable: z.boolean().optional(),
+    estimatedDeliveryAt: z.number().optional(),
   });
   export type Variant = z.infer<typeof VariantSchema>;
 
   export const AdditionalSchema = z.object({
     sku: z.string().optional(),
     baselinkerFields: BaselinkerFieldsSchema.optional(),
+    isPresale: z.boolean().optional(),
   });
   export type Additional = z.infer<typeof AdditionalSchema>;
 
@@ -41,6 +44,7 @@ export namespace BitsnapModels {
     availableQuantity: z.number().optional(),
     additional: AdditionalSchema.optional(),
     variants: z.array(VariantSchema).optional(),
+    estimatedDeliveryAt: z.number().optional(),
   });
   export type Item = z.infer<typeof ItemSchema>;
 

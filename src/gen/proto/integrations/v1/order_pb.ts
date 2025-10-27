@@ -8,6 +8,8 @@ import type { Environment } from "../../common/v1/environment_pb";
 import { file_common_v1_environment } from "../../common/v1/environment_pb";
 import type { Gateway } from "../../common/v1/gateway_pb";
 import { file_common_v1_gateway } from "../../common/v1/gateway_pb";
+import type { Address, BillingAddress } from "../../common/v1/address_pb";
+import { file_common_v1_address } from "../../common/v1/address_pb";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -16,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file integrations/v1/order.proto.
  */
 export const file_integrations_v1_order: GenFile = /*@__PURE__*/
-  fileDesc("ChtpbnRlZ3JhdGlvbnMvdjEvb3JkZXIucHJvdG8SD2ludGVncmF0aW9ucy52MSKHBAoFT3JkZXISCgoCaWQYASABKAkSLAoGc3RhdHVzGAIgASgOMhwuaW50ZWdyYXRpb25zLnYxLk9yZGVyU3RhdHVzEisKC2Vudmlyb25tZW50GAMgASgOMhYuY29tbW9uLnYxLkVudmlyb25tZW50EikKBWl0ZW1zGAQgAygLMhouaW50ZWdyYXRpb25zLnYxLk9yZGVySXRlbRIbChNhdmFpbGFibGVfY291bnRyaWVzGAUgAygJEj0KD2JpbGxpbmdfYWRkcmVzcxgGIAEoCzIfLmludGVncmF0aW9ucy52MS5CaWxsaW5nQWRkcmVzc0gAiAEBEjcKEHNoaXBwaW5nX2FkZHJlc3MYByABKAsyGC5pbnRlZ3JhdGlvbnMudjEuQWRkcmVzc0gBiAEBEjMKB2RldGFpbHMYCCABKAsyHS5pbnRlZ3JhdGlvbnMudjEuT3JkZXJEZXRhaWxzSAKIAQESMAoIY3VzdG9tZXIYCSABKAsyGS5pbnRlZ3JhdGlvbnMudjEuQ3VzdG9tZXJIA4gBARIuCgpjcmVhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEISChBfYmlsbGluZ19hZGRyZXNzQhMKEV9zaGlwcGluZ19hZGRyZXNzQgoKCF9kZXRhaWxzQgsKCV9jdXN0b21lciKLBwoMT3JkZXJEZXRhaWxzEiMKB2dhdGV3YXkYASABKA4yEi5jb21tb24udjEuR2F0ZXdheRI5ChBkZWxpdmVyeV9tZXRob2RzGAIgAygLMh8uaW50ZWdyYXRpb25zLnYxLkRlbGl2ZXJ5TWV0aG9kEiIKFWRlbGl2ZXJ5X21ldGhvZF9wcmljZRgDIAEoA0gAiAEBEhwKD2RlbGl2ZXJ5X21ldGhvZBgEIAEoCUgBiAEBEhUKDWFza19mb3JfcGhvbmUYBiABKAgSFAoMYXNrX2Zvcl9ub3RlGAcgASgIEhMKC2Fza19mb3JfbmlwGAggASgIEhgKC2NvdXBvbl9jb2RlGAkgASgJSAKIAQESIwoWY291cG9uX2Rpc2NvdW50X2Ftb3VudBgKIAEoA0gDiAEBEiUKGGNvdXBvbl9kaXNjb3VudF9jdXJyZW5jeRgLIAEoCUgEiAEBEiEKFGNvdXBvbl9kaXNjb3VudF90eXBlGAwgASgJSAWIAQESJQoYY291cG9uX2luY2x1ZGVzX2RlbGl2ZXJ5GA0gASgISAaIAQESGAoLc3VjY2Vzc191cmwYDiABKAlIB4gBARIXCgpjYW5jZWxfdXJsGA8gASgJSAiIAQESHwoScGF5bWVudF9nYXRld2F5X2lkGBAgASgJSAmIAQESPQoIbWV0YWRhdGEYESADKAsyKy5pbnRlZ3JhdGlvbnMudjEuT3JkZXJEZXRhaWxzLk1ldGFkYXRhRW50cnkSQQoVYWRkaXRpb25hbF9hZ3JlZW1lbnRzGBIgAygLMiIuaW50ZWdyYXRpb25zLnYxLkNoZWNrb3V0QWdyZWVtZW50Gi8KDU1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUIYChZfZGVsaXZlcnlfbWV0aG9kX3ByaWNlQhIKEF9kZWxpdmVyeV9tZXRob2RCDgoMX2NvdXBvbl9jb2RlQhkKF19jb3Vwb25fZGlzY291bnRfYW1vdW50QhsKGV9jb3Vwb25fZGlzY291bnRfY3VycmVuY3lCFwoVX2NvdXBvbl9kaXNjb3VudF90eXBlQhsKGV9jb3Vwb25faW5jbHVkZXNfZGVsaXZlcnlCDgoMX3N1Y2Nlc3NfdXJsQg0KC19jYW5jZWxfdXJsQhUKE19wYXltZW50X2dhdGV3YXlfaWQilQEKEUNoZWNrb3V0QWdyZWVtZW50Eg8KAmlkGAEgASgJSACIAQESDAoEbmFtZRgCIAEoCRIYCgtkZXNjcmlwdGlvbhgDIAEoCUgBiAEBEhAKCHJlcXVpcmVkGAQgASgIEhMKBmFuc3dlchgFIAEoCEgCiAEBQgUKA19pZEIOCgxfZGVzY3JpcHRpb25CCQoHX2Fuc3dlciKaAwoITWV0YWRhdGESCwoDa2V5GAEgASgJEhYKDHN0cmluZ192YWx1ZRgCIAEoCUgAEhcKDWJvb2xlYW5fdmFsdWUYAyABKAhIABIWCgxudW1iZXJfdmFsdWUYBCABKANIABIWCgxzZWxlY3RfdmFsdWUYBSABKAlIABI7CgthcnJheV92YWx1ZRgGIAEoCzIkLmludGVncmF0aW9ucy52MS5NZXRhZGF0YS5BcnJheVZhbHVlSAAa2QEKCkFycmF5VmFsdWUSPgoIZWxlbWVudHMYASADKAsyLC5pbnRlZ3JhdGlvbnMudjEuTWV0YWRhdGEuQXJyYXlWYWx1ZS5FbGVtZW50GooBCgdFbGVtZW50EhYKDHN0cmluZ192YWx1ZRgBIAEoCUgAEhcKDWJvb2xlYW5fdmFsdWUYAiABKAhIABIVCgtmbG9hdF92YWx1ZRgDIAEoAkgAEhYKDG51bWJlcl92YWx1ZRgEIAEoA0gAEhYKDG9iamVjdF92YWx1ZRgFIAEoDEgAQgcKBXZhbHVlQgcKBXZhbHVlIocBCgdBZGRyZXNzEgwKBG5hbWUYASABKAkSDQoFbGluZTEYAiABKAkSEgoFbGluZTIYAyABKAlIAIgBARIMCgRjaXR5GAQgASgJEg8KB2NvdW50cnkYBSABKAkSFQoIemlwX2NvZGUYBiABKAlIAYgBAUIICgZfbGluZTJCCwoJX3ppcF9jb2RlIq4BCg5CaWxsaW5nQWRkcmVzcxIMCgRuYW1lGAEgASgJEg0KBWxpbmUxGAIgASgJEhIKBWxpbmUyGAMgASgJSACIAQESDAoEY2l0eRgEIAEoCRIPCgdjb3VudHJ5GAUgASgJEhUKCHppcF9jb2RlGAYgASgJSAGIAQESEwoGdGF4X2lkGAcgASgJSAKIAQFCCAoGX2xpbmUyQgsKCV96aXBfY29kZUIJCgdfdGF4X2lkIsIBCglPcmRlckl0ZW0SCgoCaWQYASABKAkSEAoIcXVhbnRpdHkYAiABKAUSDQoFcHJpY2UYAyABKAMSEAoIY3VycmVuY3kYBCABKAkSEAoDdGF4GAUgASgFSACIAQESEQoEbmFtZRgGIAEoCUgBiAEBEjIKCXJlY3VycmluZxgHIAEoCzIaLmludGVncmF0aW9ucy52MS5SZWN1cnJpbmdIAogBAUIGCgRfdGF4QgcKBV9uYW1lQgwKCl9yZWN1cnJpbmciUwoIQ3VzdG9tZXISDQoFZW1haWwYASABKAkSEgoFcGhvbmUYAiABKAlIAIgBARIRCgRuYW1lGAMgASgJSAGIAQFCCAoGX3Bob25lQgcKBV9uYW1lIkcKDkRlbGl2ZXJ5TWV0aG9kEgwKBG5hbWUYASABKAkSCwoDbWluGAIgASgFEgsKA21heBgDIAEoBRINCgVwcmljZRgEIAEoAyKjAQoJUmVjdXJyaW5nEjYKDmJpbGxpbmdfcGVyaW9kGAEgASgOMh4uaW50ZWdyYXRpb25zLnYxLkJpbGxpbmdQZXJpb2QSFwoKdHJpYWxfZGF5cxgCIAEoBUgAiAEBEh8KEm51bWJlcl9vZl9wYXltZW50cxgDIAEoBUgBiAEBQg0KC190cmlhbF9kYXlzQhUKE19udW1iZXJfb2ZfcGF5bWVudHMqPgoLT3JkZXJTdGF0dXMSCwoHQ1JFQVRFRBAAEggKBFBBSUQQARIKCgZVTlBBSUQQAhIMCghDQU5DRUxFRBADKmMKDUJpbGxpbmdQZXJpb2QSCQoFREFJTFkQABIKCgZXRUVLTFkQARILCgdNT05USExZEAISDQoJUVVBUlRFUkxZEAMSEQoNU0VNSV9BTk5VQUxMWRAEEgwKCEFOTlVBTExZEAVCWlpYZ2l0aHViLmNvbS9lbW1lbXMvc3VwZXItY2FydC9hcHBzL3Nydi13b3JrZXIvdXRpbHMvbW9kZWxzL2ludGVncmF0aW9ucy92MTtpbnRlZ3JhdGlvbnN2MWIGcHJvdG8z", [file_common_v1_environment, file_common_v1_gateway, file_google_protobuf_timestamp]);
+  fileDesc("ChtpbnRlZ3JhdGlvbnMvdjEvb3JkZXIucHJvdG8SD2ludGVncmF0aW9ucy52MSL7AwoFT3JkZXISCgoCaWQYASABKAkSLAoGc3RhdHVzGAIgASgOMhwuaW50ZWdyYXRpb25zLnYxLk9yZGVyU3RhdHVzEisKC2Vudmlyb25tZW50GAMgASgOMhYuY29tbW9uLnYxLkVudmlyb25tZW50EikKBWl0ZW1zGAQgAygLMhouaW50ZWdyYXRpb25zLnYxLk9yZGVySXRlbRIbChNhdmFpbGFibGVfY291bnRyaWVzGAUgAygJEjcKD2JpbGxpbmdfYWRkcmVzcxgGIAEoCzIZLmNvbW1vbi52MS5CaWxsaW5nQWRkcmVzc0gAiAEBEjEKEHNoaXBwaW5nX2FkZHJlc3MYByABKAsyEi5jb21tb24udjEuQWRkcmVzc0gBiAEBEjMKB2RldGFpbHMYCCABKAsyHS5pbnRlZ3JhdGlvbnMudjEuT3JkZXJEZXRhaWxzSAKIAQESMAoIY3VzdG9tZXIYCSABKAsyGS5pbnRlZ3JhdGlvbnMudjEuQ3VzdG9tZXJIA4gBARIuCgpjcmVhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEISChBfYmlsbGluZ19hZGRyZXNzQhMKEV9zaGlwcGluZ19hZGRyZXNzQgoKCF9kZXRhaWxzQgsKCV9jdXN0b21lciKLBwoMT3JkZXJEZXRhaWxzEiMKB2dhdGV3YXkYASABKA4yEi5jb21tb24udjEuR2F0ZXdheRI5ChBkZWxpdmVyeV9tZXRob2RzGAIgAygLMh8uaW50ZWdyYXRpb25zLnYxLkRlbGl2ZXJ5TWV0aG9kEiIKFWRlbGl2ZXJ5X21ldGhvZF9wcmljZRgDIAEoA0gAiAEBEhwKD2RlbGl2ZXJ5X21ldGhvZBgEIAEoCUgBiAEBEhUKDWFza19mb3JfcGhvbmUYBiABKAgSFAoMYXNrX2Zvcl9ub3RlGAcgASgIEhMKC2Fza19mb3JfbmlwGAggASgIEhgKC2NvdXBvbl9jb2RlGAkgASgJSAKIAQESIwoWY291cG9uX2Rpc2NvdW50X2Ftb3VudBgKIAEoA0gDiAEBEiUKGGNvdXBvbl9kaXNjb3VudF9jdXJyZW5jeRgLIAEoCUgEiAEBEiEKFGNvdXBvbl9kaXNjb3VudF90eXBlGAwgASgJSAWIAQESJQoYY291cG9uX2luY2x1ZGVzX2RlbGl2ZXJ5GA0gASgISAaIAQESGAoLc3VjY2Vzc191cmwYDiABKAlIB4gBARIXCgpjYW5jZWxfdXJsGA8gASgJSAiIAQESHwoScGF5bWVudF9nYXRld2F5X2lkGBAgASgJSAmIAQESPQoIbWV0YWRhdGEYESADKAsyKy5pbnRlZ3JhdGlvbnMudjEuT3JkZXJEZXRhaWxzLk1ldGFkYXRhRW50cnkSQQoVYWRkaXRpb25hbF9hZ3JlZW1lbnRzGBIgAygLMiIuaW50ZWdyYXRpb25zLnYxLkNoZWNrb3V0QWdyZWVtZW50Gi8KDU1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUIYChZfZGVsaXZlcnlfbWV0aG9kX3ByaWNlQhIKEF9kZWxpdmVyeV9tZXRob2RCDgoMX2NvdXBvbl9jb2RlQhkKF19jb3Vwb25fZGlzY291bnRfYW1vdW50QhsKGV9jb3Vwb25fZGlzY291bnRfY3VycmVuY3lCFwoVX2NvdXBvbl9kaXNjb3VudF90eXBlQhsKGV9jb3Vwb25faW5jbHVkZXNfZGVsaXZlcnlCDgoMX3N1Y2Nlc3NfdXJsQg0KC19jYW5jZWxfdXJsQhUKE19wYXltZW50X2dhdGV3YXlfaWQilQEKEUNoZWNrb3V0QWdyZWVtZW50Eg8KAmlkGAEgASgJSACIAQESDAoEbmFtZRgCIAEoCRIYCgtkZXNjcmlwdGlvbhgDIAEoCUgBiAEBEhAKCHJlcXVpcmVkGAQgASgIEhMKBmFuc3dlchgFIAEoCEgCiAEBQgUKA19pZEIOCgxfZGVzY3JpcHRpb25CCQoHX2Fuc3dlciKaAwoITWV0YWRhdGESCwoDa2V5GAEgASgJEhYKDHN0cmluZ192YWx1ZRgCIAEoCUgAEhcKDWJvb2xlYW5fdmFsdWUYAyABKAhIABIWCgxudW1iZXJfdmFsdWUYBCABKANIABIWCgxzZWxlY3RfdmFsdWUYBSABKAlIABI7CgthcnJheV92YWx1ZRgGIAEoCzIkLmludGVncmF0aW9ucy52MS5NZXRhZGF0YS5BcnJheVZhbHVlSAAa2QEKCkFycmF5VmFsdWUSPgoIZWxlbWVudHMYASADKAsyLC5pbnRlZ3JhdGlvbnMudjEuTWV0YWRhdGEuQXJyYXlWYWx1ZS5FbGVtZW50GooBCgdFbGVtZW50EhYKDHN0cmluZ192YWx1ZRgBIAEoCUgAEhcKDWJvb2xlYW5fdmFsdWUYAiABKAhIABIVCgtmbG9hdF92YWx1ZRgDIAEoAkgAEhYKDG51bWJlcl92YWx1ZRgEIAEoA0gAEhYKDG9iamVjdF92YWx1ZRgFIAEoDEgAQgcKBXZhbHVlQgcKBXZhbHVlIsIBCglPcmRlckl0ZW0SCgoCaWQYASABKAkSEAoIcXVhbnRpdHkYAiABKAUSDQoFcHJpY2UYAyABKAMSEAoIY3VycmVuY3kYBCABKAkSEAoDdGF4GAUgASgFSACIAQESEQoEbmFtZRgGIAEoCUgBiAEBEjIKCXJlY3VycmluZxgHIAEoCzIaLmludGVncmF0aW9ucy52MS5SZWN1cnJpbmdIAogBAUIGCgRfdGF4QgcKBV9uYW1lQgwKCl9yZWN1cnJpbmciUwoIQ3VzdG9tZXISDQoFZW1haWwYASABKAkSEgoFcGhvbmUYAiABKAlIAIgBARIRCgRuYW1lGAMgASgJSAGIAQFCCAoGX3Bob25lQgcKBV9uYW1lIkcKDkRlbGl2ZXJ5TWV0aG9kEgwKBG5hbWUYASABKAkSCwoDbWluGAIgASgFEgsKA21heBgDIAEoBRINCgVwcmljZRgEIAEoAyKjAQoJUmVjdXJyaW5nEjYKDmJpbGxpbmdfcGVyaW9kGAEgASgOMh4uaW50ZWdyYXRpb25zLnYxLkJpbGxpbmdQZXJpb2QSFwoKdHJpYWxfZGF5cxgCIAEoBUgAiAEBEh8KEm51bWJlcl9vZl9wYXltZW50cxgDIAEoBUgBiAEBQg0KC190cmlhbF9kYXlzQhUKE19udW1iZXJfb2ZfcGF5bWVudHMqPgoLT3JkZXJTdGF0dXMSCwoHQ1JFQVRFRBAAEggKBFBBSUQQARIKCgZVTlBBSUQQAhIMCghDQU5DRUxFRBADKmMKDUJpbGxpbmdQZXJpb2QSCQoFREFJTFkQABIKCgZXRUVLTFkQARILCgdNT05USExZEAISDQoJUVVBUlRFUkxZEAMSEQoNU0VNSV9BTk5VQUxMWRAEEgwKCEFOTlVBTExZEAVCWlpYZ2l0aHViLmNvbS9lbW1lbXMvc3VwZXItY2FydC9hcHBzL3Nydi13b3JrZXIvdXRpbHMvbW9kZWxzL2ludGVncmF0aW9ucy92MTtpbnRlZ3JhdGlvbnN2MWIGcHJvdG8z", [file_common_v1_environment, file_common_v1_gateway, file_common_v1_address, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message integrations.v1.Order
@@ -48,12 +50,12 @@ export type Order = Message<"integrations.v1.Order"> & {
   availableCountries: string[];
 
   /**
-   * @generated from field: optional integrations.v1.BillingAddress billing_address = 6;
+   * @generated from field: optional common.v1.BillingAddress billing_address = 6;
    */
   billingAddress?: BillingAddress;
 
   /**
-   * @generated from field: optional integrations.v1.Address shipping_address = 7;
+   * @generated from field: optional common.v1.Address shipping_address = 7;
    */
   shippingAddress?: Address;
 
@@ -333,95 +335,6 @@ export const Metadata_ArrayValue_ElementSchema: GenMessage<Metadata_ArrayValue_E
   messageDesc(file_integrations_v1_order, 3, 0, 0);
 
 /**
- * @generated from message integrations.v1.Address
- */
-export type Address = Message<"integrations.v1.Address"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * @generated from field: string line1 = 2;
-   */
-  line1: string;
-
-  /**
-   * @generated from field: optional string line2 = 3;
-   */
-  line2?: string;
-
-  /**
-   * @generated from field: string city = 4;
-   */
-  city: string;
-
-  /**
-   * @generated from field: string country = 5;
-   */
-  country: string;
-
-  /**
-   * @generated from field: optional string zip_code = 6;
-   */
-  zipCode?: string;
-};
-
-/**
- * Describes the message integrations.v1.Address.
- * Use `create(AddressSchema)` to create a new message.
- */
-export const AddressSchema: GenMessage<Address> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 4);
-
-/**
- * @generated from message integrations.v1.BillingAddress
- */
-export type BillingAddress = Message<"integrations.v1.BillingAddress"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * @generated from field: string line1 = 2;
-   */
-  line1: string;
-
-  /**
-   * @generated from field: optional string line2 = 3;
-   */
-  line2?: string;
-
-  /**
-   * @generated from field: string city = 4;
-   */
-  city: string;
-
-  /**
-   * @generated from field: string country = 5;
-   */
-  country: string;
-
-  /**
-   * @generated from field: optional string zip_code = 6;
-   */
-  zipCode?: string;
-
-  /**
-   * @generated from field: optional string tax_id = 7;
-   */
-  taxId?: string;
-};
-
-/**
- * Describes the message integrations.v1.BillingAddress.
- * Use `create(BillingAddressSchema)` to create a new message.
- */
-export const BillingAddressSchema: GenMessage<BillingAddress> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 5);
-
-/**
  * @generated from message integrations.v1.OrderItem
  */
 export type OrderItem = Message<"integrations.v1.OrderItem"> & {
@@ -466,7 +379,7 @@ export type OrderItem = Message<"integrations.v1.OrderItem"> & {
  * Use `create(OrderItemSchema)` to create a new message.
  */
 export const OrderItemSchema: GenMessage<OrderItem> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 6);
+  messageDesc(file_integrations_v1_order, 4);
 
 /**
  * @generated from message integrations.v1.Customer
@@ -493,7 +406,7 @@ export type Customer = Message<"integrations.v1.Customer"> & {
  * Use `create(CustomerSchema)` to create a new message.
  */
 export const CustomerSchema: GenMessage<Customer> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 7);
+  messageDesc(file_integrations_v1_order, 5);
 
 /**
  * @generated from message integrations.v1.DeliveryMethod
@@ -525,7 +438,7 @@ export type DeliveryMethod = Message<"integrations.v1.DeliveryMethod"> & {
  * Use `create(DeliveryMethodSchema)` to create a new message.
  */
 export const DeliveryMethodSchema: GenMessage<DeliveryMethod> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 8);
+  messageDesc(file_integrations_v1_order, 6);
 
 /**
  * @generated from message integrations.v1.Recurring
@@ -552,7 +465,7 @@ export type Recurring = Message<"integrations.v1.Recurring"> & {
  * Use `create(RecurringSchema)` to create a new message.
  */
 export const RecurringSchema: GenMessage<Recurring> = /*@__PURE__*/
-  messageDesc(file_integrations_v1_order, 9);
+  messageDesc(file_integrations_v1_order, 7);
 
 /**
  * @generated from enum integrations.v1.OrderStatus

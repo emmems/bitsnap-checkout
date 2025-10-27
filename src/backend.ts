@@ -5,7 +5,7 @@ import {
   NotifyUserAboutProductAvailabilityRequestSchema,
 } from "./gen/proto/public/v1/public_api_pb";
 import { BitsnapModels } from "./models";
-import { PublicApiClient } from "./public.api.client";
+import { PublicApiClient } from "./public.api.backend";
 
 let BACKEND_HOST = "https://bitsnap.pl";
 let API_KEY: string | undefined;
