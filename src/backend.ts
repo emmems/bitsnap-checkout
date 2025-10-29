@@ -107,19 +107,24 @@ export namespace BitsnapBackend {
 
     const downloadedPayload = await result.json();
 
-    const parsedResult =
-      await BitsnapModels.ProductsResultElementSchema.parseAsync(
-        downloadedPayload,
-      );
-    if (parsedResult.length == 0) {
-      return {
-        categories: undefined,
-        products: undefined,
-      };
-    }
-    const parsed = parsedResult[0];
+    try {
+      const parsedResult =
+        await BitsnapModels.ProductsResultElementSchema.parseAsync(
+          downloadedPayload,
+        );
+      if (parsedResult.length == 0) {
+        return {
+          categories: undefined,
+          products: undefined,
+        };
+      }
+      const parsed = parsedResult[0];
 
-    return parsed.result;
+      return parsed.result;
+    } catch (error) {
+      console.error("Error parsing products result:", JSON.stringify(error));
+      throw error;
+    }
   }
 
   export async function sendNotification(

@@ -15,7 +15,7 @@ export namespace BitsnapModels {
     currency: z.string(),
     metadata: MetadataSchema.optional(),
     images: z.array(z.string()),
-    availableQuantity: z.number(),
+    availableQuantity: z.number().optional(),
     isDeliverable: z.boolean().optional(),
     estimatedDeliveryAt: z.number().optional(),
   });
