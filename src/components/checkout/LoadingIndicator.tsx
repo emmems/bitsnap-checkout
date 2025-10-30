@@ -1,6 +1,6 @@
-const LoadingIndicator = ({className}: { className?: string }) => {
+const LoadingIndicator = ({ className }: { className?: string }) => {
     return (
-            <LoadingSpinner className={className ?? ''}/>
+        <LoadingSpinner color="#ffffff" className={className ?? ''} />
     );
 }
 
@@ -17,5 +17,5 @@ const LoadingSpinner = ({ size, color, className }: { size?: string; color?: str
         borderRadius: '50%',
     };
 
-    return <div className={className + ' animate-spin'} style={spinnerStyle}></div>;
+    return <div className={className + ' ics-animate-spin'} style={spinnerStyle}></div>;
 };

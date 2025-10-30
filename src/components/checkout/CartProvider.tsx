@@ -18,6 +18,7 @@ import { round } from "./lib/round.number";
 import { LinkRequest } from "./link.request.schema";
 import { createPaymentURL, injectReferenceToRequestIfNeeded } from "./methods";
 import { SingleProduct } from "./product.details.model";
+import { animateValue } from "framer-motion";
 
 export const MARKETING_AGREEMENT_ID = "__m_a";
 
@@ -31,12 +32,12 @@ export interface CartMethods {
   getProducts: () => Promise<
     | Err
     | {
-        id: string;
-        productID: string;
-        quantity: number;
-        metadata?: { [key: string]: string | undefined };
-        details?: SingleProduct;
-      }[]
+      id: string;
+      productID: string;
+      quantity: number;
+      metadata?: { [key: string]: string | undefined };
+      details?: SingleProduct;
+    }[]
   >;
 
   updateQuantity(args: { id: string; quantity: number }): Promise<Err | void>;
@@ -67,8 +68,8 @@ export interface CartMethods {
   }) => Promise<
     | Err
     | {
-        redirectURL?: string;
-      }
+      redirectURL?: string;
+    }
   >;
 
   justRedirectToPayment: (args: {
@@ -80,8 +81,8 @@ export interface CartMethods {
   }) => Promise<
     | Err
     | {
-        url: string;
-      }
+      url: string;
+    }
   >;
 }
 
@@ -134,12 +135,12 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
 const getProducts: (projectID: string) => Promise<
   | Err
   | {
-      id: string;
-      productID: string;
-      quantity: number;
-      metadata?: { [key: string]: string | undefined };
-      details?: SingleProduct;
-    }[]
+    id: string;
+    productID: string;
+    quantity: number;
+    metadata?: { [key: string]: string | undefined };
+    details?: SingleProduct;
+  }[]
 > = async (projectID: string) => {
   const products = getCheckout()?.products ?? [];
 
@@ -318,12 +319,12 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     async getProducts(): Promise<
       | Err
       | {
-          id: string;
-          productID: string;
-          quantity: number;
-          metadata?: { [p: string]: string | undefined };
-          details?: SingleProduct;
-        }[]
+        id: string;
+        productID: string;
+        quantity: number;
+        metadata?: { [p: string]: string | undefined };
+        details?: SingleProduct;
+      }[]
     > {
       return await getProducts(projectID);
     },
@@ -465,9 +466,9 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         details:
           args.email || args.name
             ? {
-                name: args.name,
-                email: args.email,
-              }
+              name: args.name,
+              email: args.email,
+            }
             : undefined,
       };
 
@@ -530,8 +531,8 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     }): Promise<
       | Err
       | {
-          redirectURL?: string;
-        }
+        redirectURL?: string;
+      }
     > {
       const checkout = getCheckout();
       if (checkout == null) {
@@ -653,6 +654,19 @@ function resolveProductDetailsFromSingleProduct(
   product: SingleProduct,
 ) {
   if (id == product.id) {
+    const variantIndex = product.variants?.findIndex((v) => v.id === id);
+    if (variantIndex != null && variantIndex != -1) {
+      const variant = product.variants![variantIndex];
+      return {
+        ...product,
+        availableQuantity: variant.availableQuantity,
+        isDeliverable: variant.isDeliverable,
+        images: variant.images ?? product.images,
+        name: product.name + " " + variant.name,
+        price: variant.price,
+        currency: variant.currency
+      }
+    }
     return product;
   }
 

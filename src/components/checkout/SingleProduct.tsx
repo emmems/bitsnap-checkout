@@ -3,7 +3,7 @@ import { formatCurrency } from "./lib/round.number";
 import type { SingleProduct } from "./product.details.model";
 
 
-const SingleProduct = ({quantity, details, shouldUpdate}: {
+const SingleProduct = ({ quantity, details, shouldUpdate }: {
     quantity: number;
     metadata?: { [key: string]: string | undefined };
     details: SingleProduct;
@@ -12,13 +12,13 @@ const SingleProduct = ({quantity, details, shouldUpdate}: {
 
     return (
         <div className={'ics-flex ics-items-center ics-gap-3'}>
-            <img className={'ics-aspect-auto ics-max-w-[30%]'} src={details.image_url ?? ''} alt={details.name}/>
+            <img className={'ics-aspect-auto ics-max-w-[30%] ics-max-w-32 ics-max-h-32'} src={details.image_url ?? ''} alt={details.name} />
 
             <div className={'ics-flex ics-flex-col'}>
                 <p className={'ics-font-medium'}>{details.name}</p>
                 <p className={'ics-text-sm'}>{formatCurrency(details.price, details.currency)}</p>
                 <div className={'ics-flex ics-justify-between'}>
-                    <QuantityComponent className={""} quantity={quantity} shouldUpdate={shouldUpdate}/>
+                    <QuantityComponent className={""} quantity={quantity} shouldUpdate={shouldUpdate} />
                     <button className={'ics-text-sm ics-font-medium'} onClick={() => shouldUpdate(0)}>Usuń</button>
                 </div>
             </div>

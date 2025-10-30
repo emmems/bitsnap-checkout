@@ -7,6 +7,7 @@ import { isErr } from "./lib/err";
 import { formatCurrency } from "./lib/round.number";
 import LoadingIndicator from "./LoadingIndicator";
 import SingleProduct from "./SingleProduct";
+import { Skeleton } from "./Skeleton";
 
 const CartComponentContent = ({ className }: { className: string }) => {
   const provider = useCartProvider();
@@ -98,8 +99,9 @@ const CartComponentContent = ({ className }: { className: string }) => {
   return (
     <div className={`${className} ics-flex ics-flex-col`} ref={productsParent}>
       {isLoading && (
-        <div className={"ics-flex ics-w-full ics-justify-center"}>
-          <LoadingIndicator />
+        <div className={"ics-relative ics-flex ics-w-full ics-justify-center ics-flex-col ics-gap-4"}>
+          <Skeleton className={"ics-w-full ics-h-32"} />
+          <Skeleton className={"ics-w-full ics-h-32"} />
         </div>
       )}
 
