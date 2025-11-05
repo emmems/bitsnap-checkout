@@ -6,7 +6,7 @@ import { isErr } from "./lib/err";
 import { round } from "./lib/round.number";
 
 type Props = {
-  items: { name: string; id: string; price: number; quantity: number }[];
+  items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
   onClick?: () => Promise<void>;
 };
 
@@ -29,11 +29,18 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
     return null;
   }
 
+  const expectedItems = items.map(el => ({
+    productID: el.id,
+    quantity: el.quantity,
+    metadata: el.metadata,
+  }));
+
   async function beginSession() {
     const session = new ApplePaySession(14, {
       countryCode: "PL",
       merchantCapabilities: ["supports3DS"],
       supportedNetworks: ["visa", "masterCard"],
+      currencyCode: "PLN",
       total: {
         amount: `${round(items.reduce((acc, item) => acc + item.price * item.quantity, 0) / 100, 2)}`,
         label: "Płatność za koszyk",
@@ -44,10 +51,17 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
         label: item.name,
         type: "final",
       })),
-      currencyCode: "PLN",
+      ...(
+        items.find(el => el.isDeliverable === true) ? {
+          shippingMethods: [],
+          supportsCouponCode: true,
+          requiredBillingContactFields: ["name", "email", "postalAddress", "phone"],
+          requiredShippingContactFields: ["name", "email", "postalAddress", "phone"],
+        } : {}
+      ),
     });
     await onClick?.();
-    const apRequest = await getApplePayPaymentRequest();
+    const apRequest = await getApplePayPaymentRequest({ expectedItems });
     if (isErr(apRequest)) {
       console.error("Error creating ApplePaySession:", apRequest.error);
       return;
@@ -67,6 +81,7 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
         );
         console.log("merchantSession", result.merchantSession);
         if (result.merchantSession.length > 0) {
+          console.log('completing merchant session');
           session.completeMerchantValidation(
             JSON.parse(result.merchantSession),
           );
@@ -80,7 +95,7 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
 
     session.onshippingmethodselected = async (event) => {
       await setDeliveryMethod(event.shippingMethod.identifier);
-      const apRequest = await getApplePayPaymentRequest();
+      const apRequest = await getApplePayPaymentRequest({ expectedItems });
       if (isErr(apRequest)) {
         session.abort();
         throw new Error("Failed to get Apple Pay payment request");
@@ -103,12 +118,13 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
         if (event.shippingContact.phoneNumber != null) {
           await setEmail(event.shippingContact.emailAddress);
         }
-        const apRequest = await getApplePayPaymentRequest();
+        const apRequest = await getApplePayPaymentRequest({ expectedItems });
         if (isErr(apRequest)) {
           session.abort();
           throw new Error("Failed to get Apple Pay payment request");
         }
 
+        console.log('apRequest', apRequest);
         session.completeShippingContactSelection({
           newLineItems: apRequest.lineItems,
           newTotal: apRequest.total,
@@ -116,14 +132,14 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
         });
       } catch (error) {
         console.log("shipping contact selected error", error);
-        session.abort;
+        session.abort();
       }
     };
 
     session.oncouponcodechanged = async (event) => {
       try {
         const result = await setCouponCodeIfPossible(event.couponCode);
-        const apRequest = await getApplePayPaymentRequest();
+        const apRequest = await getApplePayPaymentRequest({ expectedItems });
         if (isErr(apRequest)) {
           session.abort();
           throw new Error("Failed to get Apple Pay payment request");

@@ -22,12 +22,14 @@ import { animateValue } from "framer-motion";
 
 export const MARKETING_AGREEMENT_ID = "__m_a";
 
+type CartProduct = {
+  productID: string;
+  quantity: number;
+  metadata?: { [key: string]: string | undefined };
+}
+
 export interface CartMethods {
-  addProduct(args: {
-    productID: string;
-    quantity: number;
-    metadata?: { [key: string]: string | undefined };
-  }): Promise<Err | void>;
+  addProduct(args: CartProduct): Promise<Err | void>;
 
   getProducts: () => Promise<
     | Err
@@ -58,7 +60,7 @@ export interface CartMethods {
 
   redirectToNextStep: () => Promise<Err | { url: string }>;
 
-  getApplePayPaymentRequest: () => Promise<
+  getApplePayPaymentRequest: (args?: { expectedItems?: CartProduct[]; }) => Promise<
     Err | ApplePayJS.ApplePayPaymentRequest
   >;
   completeApplePayPayment: (args: {
@@ -250,6 +252,31 @@ function getCheckout(): Checkout {
   }
 }
 
+function addProducts(products: CartProduct[]) {
+  const checkout = getCheckout();
+  if (checkout.products == null) {
+    checkout.products = [];
+  }
+  checkout.products.push(...products.map(el => ({
+    id: Math.random().toString(36).substring(7),
+    productID: el.productID,
+    quantity: el.quantity,
+    metadata: el.metadata,
+  })));
+  saveCheckout(checkout);
+}
+
+function removeProductFromCheckout(ids: string[]) {
+  const checkout = getCheckout();
+  const newCheckout = {
+    ...checkout,
+    products: checkout?.products?.filter(
+      (product) => !ids.includes(product.productID) && !ids.includes(product.id),
+    ),
+  };
+  saveCheckout(newCheckout);
+}
+
 function saveCheckout(model: Checkout) {
   localStorage.setItem(checkoutKey, JSON.stringify(model));
 }
@@ -330,15 +357,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     },
 
     async removeProductFromCart(args: { id: string }): Promise<Err | void> {
-      const checkout = getCheckout();
-
-      const newCheckout = {
-        ...checkout,
-        products: checkout?.products?.filter(
-          (product) => product.id !== args.id,
-        ),
-      };
-      saveCheckout(newCheckout);
+      return removeProductFromCheckout([args.id]);
     },
 
     async setCountry(country: string): Promise<Err | void> {
@@ -371,22 +390,8 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       saveCheckout(checkout);
     },
 
-    async addProduct(args: {
-      productID: string;
-      quantity: number;
-      metadata?: { [p: string]: string | undefined };
-    }): Promise<Err | void> {
-      const checkout = getCheckout();
-      if (checkout.products == null) {
-        checkout.products = [];
-      }
-      checkout.products.push({
-        id: Math.random().toString(36).substring(7),
-        productID: args.productID,
-        quantity: args.quantity,
-        metadata: args.metadata,
-      });
-      saveCheckout(checkout);
+    async addProduct(args: CartProduct): Promise<Err | void> {
+      return addProducts([args]);
     },
 
     async updateQuantity(args: {
@@ -548,7 +553,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       try {
         const result = await PublicApiClient.get(HOST).applePayAuthorizePayment(
           {
-            paymentData: args.token.paymentData,
+            paymentData: JSON.stringify(args.token.paymentData),
             paymentMethod: JSON.stringify(args.token.paymentMethod),
             transactionIdentifier: args.token.transactionIdentifier,
             order: create(GetPreOrderDetailsRequestSchema, {
@@ -562,8 +567,20 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
               postCode: checkout.postalCode,
               projectId: projectID,
             }),
-            shippingAddress: create(AddressSchema, {}),
-            billingAddress: create(BillingAddressSchema, {}),
+            shippingAddress: create(AddressSchema, {
+              line1: args.shippingContact?.addressLines?.[0] ?? "",
+              city: args.shippingContact?.locality ?? "",
+              country: args.shippingContact?.countryCode ?? "",
+              zipCode: args.shippingContact?.postalCode ?? "",
+              name: args.shippingContact?.givenName ?? '' + ' ' + (args.shippingContact?.familyName ?? ''),
+            }),
+            billingAddress: create(BillingAddressSchema, {
+              name: args.billingContact?.givenName ?? '' + ' ' + (args.billingContact?.familyName ?? ''),
+              line1: args.billingContact?.addressLines?.[0] ?? "",
+              city: args.billingContact?.locality ?? "",
+              country: args.billingContact?.countryCode ?? "",
+              zipCode: args.billingContact?.postalCode ?? "",
+            }),
           },
         );
 
@@ -576,14 +593,20 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       }
     },
 
-    async getApplePayPaymentRequest(): Promise<
+    async getApplePayPaymentRequest(args?: { expectedItems?: CartProduct[]; }): Promise<
       Err | ApplePayJS.ApplePayPaymentRequest
     > {
       const checkout = getCheckout();
       if (checkout == null) {
         return Err("Checkout not found");
       }
-      console.log("lol", this);
+      if (args && args.expectedItems != null && args.expectedItems.length > 0) {
+        if (checkout.products) {
+          removeProductFromCheckout(checkout.products.map(el => el.productID));
+        }
+        addProducts(args.expectedItems);
+      }
+
       const products = await getProducts(projectID);
 
       if (isErr(products)) {
@@ -592,12 +615,13 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
 
       const result = await PublicApiClient.get(HOST).getPreOrderDetails({
         items: products.map((el) =>
-          create(PreOrderItemSchema, { id: el.id, quantity: el.quantity }),
+          create(PreOrderItemSchema, { id: el.productID, quantity: el.quantity }),
         ),
         projectId: projectID,
         // we can detect 5 the closest inpost pickup point based on shipping address.
         postCode: checkout.postalCode,
         couponCode: checkout.couponCode,
+        countryCode: checkout.country,
         selectedDeliveryMethod: checkout.selectedDeliveryMethod,
       });
 
@@ -609,6 +633,17 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         };
       });
 
+      if (result.selectedDeliveryMethod != null) {
+        const deliveryMethod = result.methods.find(el => el.id == result.selectedDeliveryMethod);
+        if (deliveryMethod != null) {
+          items.push({
+            amount: `${round(deliveryMethod.amount / 100, 2)}`,
+            label: deliveryMethod.name,
+            type: "final" as ApplePayJS.ApplePayLineItemType,
+          })
+        }
+      }
+
       return {
         countryCode: checkout.country ?? "PL",
         merchantCapabilities: [
@@ -618,7 +653,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         ],
         supportedNetworks: ["visa", "masterCard"],
         total: {
-          amount: "",
+          amount: `${round(((result.totalAmount ?? 0) / 100), 2)}`,
           label: "Płatność za koszyk",
           type: "final",
         },
