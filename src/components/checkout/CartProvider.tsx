@@ -29,6 +29,8 @@ type CartProduct = {
 }
 
 export interface CartMethods {
+  checkIfApplePayIsAvailable(): Promise<boolean>;
+
   addProduct(args: CartProduct): Promise<Err | void>;
 
   getProducts: () => Promise<
@@ -289,6 +291,25 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     setCustomHost(newHost);
   }
   return {
+    async checkIfApplePayIsAvailable(): Promise<boolean> {
+      if (typeof window == "undefined" || typeof document == 'undefined') {
+        return false;
+      }
+      if ("ApplePaySession" in window === false) {
+        return false;
+      }
+
+      try {
+        const result = await PublicApiClient.get(HOST).isOneClickPaymentAvailable({
+          projectId: projectID,
+        });
+
+        return result.applePay;
+      } catch (e) {
+        console.error("Error checking if Apple Pay is available", e);
+        return false;
+      }
+    },
     async clearCart(): Promise<Err | void> {
       const empty = structuredClone(emptyCheckout);
       empty.country = getCheckout()?.country;

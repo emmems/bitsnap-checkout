@@ -4,6 +4,7 @@ import CartProvider, { getProjectID, useCartProvider } from "./CartProvider";
 import { HOST } from "./constants";
 import { isErr } from "./lib/err";
 import { round } from "./lib/round.number";
+import { useQuery } from "react-query";
 
 type Props = {
   items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
@@ -12,6 +13,7 @@ type Props = {
 
 function ApplePayButtonComponent({ items, onClick }: Props) {
   const {
+    checkIfApplePayIsAvailable,
     getApplePayPaymentRequest,
     completeApplePayPayment,
     setCountry,
@@ -21,11 +23,8 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
     setPostalCode,
     clearCart,
   } = useCartProvider();
-  if (typeof window == "undefined") {
-    return null;
-  }
-  if ("ApplePaySession" in window === false) {
-    console.log("No Apple Pay available");
+  const { data: isApplePayAvailable } = useQuery("is-apple-pay-available", checkIfApplePayIsAvailable);
+  if (isApplePayAvailable != true) {
     return null;
   }
 
