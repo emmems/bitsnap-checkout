@@ -6,13 +6,18 @@ import { isErr } from "./lib/err";
 import { round } from "./lib/round.number";
 import { useQuery } from "react-query";
 
+type AppleButtonType = 'plain' | 'add-money' | 'book' | 'buy' | 'check-out' | 'continue' | 'contribute' | 'donate' | 'order' | 'pay' | 'reload' | 'rent' | 'set-up' | 'subscribe' | 'support' | 'tip' | 'top-up';
+type ColorType = 'black' | 'white' | 'white-outline';
+
 type Props = {
+  buttonType?: AppleButtonType;
+  colorType?: ColorType;
   className?: string;
   items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
   onClick?: () => Promise<void>;
 };
 
-function ApplePayButtonComponent({ className, items, onClick }: Props) {
+function ApplePayButtonComponent({ buttonType, colorType, className, items, onClick }: Props) {
   const {
     checkIfApplePayIsAvailable,
     getApplePayPaymentRequest,
@@ -202,7 +207,7 @@ function ApplePayButtonComponent({ className, items, onClick }: Props) {
     session.begin();
   }
 
-  return <ApplePayButton onClick={beginSession} />;
+  return <ApplePayButton buttonStyle={colorType} type={buttonType} onClick={beginSession} />;
 }
 
 function Wrapper(props: Props) {
