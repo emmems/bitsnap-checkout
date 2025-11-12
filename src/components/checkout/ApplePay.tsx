@@ -174,7 +174,7 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
 
         if (result.redirectURL) {
           setTimeout(() => {
-            open(result.redirectURL);
+            open(result.redirectURL, "_self");
           }, 2000);
         }
         session.completePayment({
