@@ -589,6 +589,13 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       }
 
       try {
+        let shippingName = args.shippingContact?.givenName;
+        if (args.shippingContact?.familyName != null) {
+          shippingName += ' ' + args.shippingContact?.familyName;
+        } else if (args.billingContact?.familyName != null) {
+          shippingName += ' ' + args.billingContact?.familyName;
+        }
+
         const result = await PublicApiClient.get(HOST).applePayAuthorizePayment(
           {
             paymentData: JSON.stringify(args.token.paymentData),
@@ -611,7 +618,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
               city: args.shippingContact?.locality ?? "",
               country: args.shippingContact?.countryCode ?? "",
               zipCode: args.shippingContact?.postalCode ?? "",
-              name: args.shippingContact?.givenName ?? '' + ' ' + (args.shippingContact?.familyName ?? ''),
+              name: shippingName,
             }),
             billingAddress: create(BillingAddressSchema, {
               name: args.billingContact?.givenName ?? '' + ' ' + (args.billingContact?.familyName ?? ''),
