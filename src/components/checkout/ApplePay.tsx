@@ -12,12 +12,11 @@ type ColorType = 'black' | 'white' | 'white-outline';
 type Props = {
   buttonType?: AppleButtonType;
   colorType?: ColorType;
-  className?: string;
   items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
   onClick?: () => Promise<void>;
 };
 
-function ApplePayButtonComponent({ buttonType, colorType, className, items, onClick }: Props) {
+function ApplePayButtonComponent({ buttonType, colorType, items, onClick }: Props) {
   const {
     checkIfApplePayIsAvailable,
     getApplePayPaymentRequest,
