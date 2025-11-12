@@ -693,6 +693,14 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         }
       }
 
+      if (result.couponCode != null && result.couponValue != null) {
+        items.push({
+          amount: `-${round(result.couponValue / 100, 2)}`,
+          label: result.couponCode,
+          type: "final" as ApplePayJS.ApplePayLineItemType,
+        });
+      }
+
       return {
         countryCode: checkout.country ?? "PL",
         merchantCapabilities: [

@@ -35,6 +35,7 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
   }));
 
   async function beginSession() {
+    const requiresShipping = items.find(el => el.isDeliverable === true) != null;
     const session = new ApplePaySession(14, {
       countryCode: "PL",
       merchantCapabilities: ["supports3DS"],
@@ -43,15 +44,22 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
       total: {
         amount: `${round(items.reduce((acc, item) => acc + item.price * item.quantity, 0) / 100, 2)}`,
         label: "Płatność za koszyk",
-        type: "final",
+        type: "pending",
       },
-      lineItems: items.map((item) => ({
-        amount: `${round((item.price * item.quantity) / 100, 2)}`,
-        label: item.name,
-        type: "final",
-      })),
+      lineItems: [
+        ...items.map((item) => ({
+          amount: `${round((item.price * item.quantity) / 100, 2)}`,
+          label: item.name,
+          type: "final",
+        } as ApplePayJS.ApplePayLineItem)),
+        requiresShipping ? {
+          amount: `16.99`,
+          type: "pending",
+          label: "Dostawa",
+        } as ApplePayJS.ApplePayLineItem : undefined
+      ].filter(el => el != null),
       ...(
-        items.find(el => el.isDeliverable === true) ? {
+        requiresShipping ? {
           shippingMethods: [],
           supportsCouponCode: true,
           requiredBillingContactFields: ["name", "email", "postalAddress", "phone"],
