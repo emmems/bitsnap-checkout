@@ -183,7 +183,7 @@ function BitsnapCart({
         onClick={() => (isCartVisible ? hideCart() : showCart())}
         className={
           className ??
-          "ics-rounded-full hover:ics-bg-neutral-300 ics-transition ics-p-1"
+          "ics-relative ics-rounded-full hover:ics-bg-neutral-300 ics-transition ics-p-1"
         }
       >
         {children ? (

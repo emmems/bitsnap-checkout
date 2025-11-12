@@ -113,8 +113,10 @@ function ApplePayButtonComponent({ style, buttonType, colorType, items, onClick 
     };
 
     session.onshippingmethodselected = async (event) => {
+      console.log("shipping method selected", event);
       await setDeliveryMethod(event.shippingMethod.identifier);
       const apRequest = await getApplePayPaymentRequest({ expectedItems });
+      console.log("apRequest", apRequest);
       if (isErr(apRequest)) {
         session.abort();
         throw new Error("Failed to get Apple Pay payment request");
@@ -157,8 +159,10 @@ function ApplePayButtonComponent({ style, buttonType, colorType, items, onClick 
 
     session.oncouponcodechanged = async (event) => {
       try {
+        console.log("coupon code changed", event);
         const result = await setCouponCodeIfPossible(event.couponCode);
         const apRequest = await getApplePayPaymentRequest({ expectedItems });
+        console.log("apRequest", apRequest);
         if (isErr(apRequest)) {
           session.abort();
           throw new Error("Failed to get Apple Pay payment request");
