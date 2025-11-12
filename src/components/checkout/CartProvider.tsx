@@ -596,7 +596,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
             transactionIdentifier: args.token.transactionIdentifier,
             order: create(GetPreOrderDetailsRequestSchema, {
               items: products.map((el) => ({
-                id: el.id,
+                id: el.productID,
                 quantity: el.quantity,
               })),
               couponCode: checkout.couponCode,
