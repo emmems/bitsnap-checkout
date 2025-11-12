@@ -10,13 +10,20 @@ type AppleButtonType = 'plain' | 'add-money' | 'book' | 'buy' | 'check-out' | 'c
 type ColorType = 'black' | 'white' | 'white-outline';
 
 type Props = {
+  style?: {
+    width?: string;
+    height?: string;
+    borderRadius?: string;
+    padding?: string;
+    boxSizing?: string;
+  };
   buttonType?: AppleButtonType;
   colorType?: ColorType;
   items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
   onClick?: () => Promise<void>;
 };
 
-function ApplePayButtonComponent({ buttonType, colorType, items, onClick }: Props) {
+function ApplePayButtonComponent({ style, buttonType, colorType, items, onClick }: Props) {
   const {
     checkIfApplePayIsAvailable,
     getApplePayPaymentRequest,
@@ -206,7 +213,7 @@ function ApplePayButtonComponent({ buttonType, colorType, items, onClick }: Prop
     session.begin();
   }
 
-  return <ApplePayButton buttonStyle={colorType} type={buttonType} onClick={beginSession} />;
+  return <ApplePayButton style={style} buttonStyle={colorType} type={buttonType} onClick={beginSession} />;
 }
 
 function Wrapper(props: Props) {
