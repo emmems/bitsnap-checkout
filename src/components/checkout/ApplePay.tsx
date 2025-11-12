@@ -7,11 +7,12 @@ import { round } from "./lib/round.number";
 import { useQuery } from "react-query";
 
 type Props = {
+  className?: string;
   items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
   onClick?: () => Promise<void>;
 };
 
-function ApplePayButtonComponent({ items, onClick }: Props) {
+function ApplePayButtonComponent({ className, items, onClick }: Props) {
   const {
     checkIfApplePayIsAvailable,
     getApplePayPaymentRequest,

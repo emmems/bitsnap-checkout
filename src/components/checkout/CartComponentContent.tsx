@@ -8,6 +8,7 @@ import { formatCurrency } from "./lib/round.number";
 import LoadingIndicator from "./LoadingIndicator";
 import SingleProduct from "./SingleProduct";
 import { Skeleton } from "./Skeleton";
+import { ApplePayButton } from "..";
 
 const CartComponentContent = ({ className }: { className: string }) => {
   const provider = useCartProvider();
@@ -31,6 +32,7 @@ const CartComponentContent = ({ className }: { className: string }) => {
     "cart-available-countries",
     provider.getAvailableCountries,
   );
+  const { data: isApplePayAvailable } = useQuery("cart-one-click-payment", provider.checkIfApplePayIsAvailable);
   const { data, isLoading, refetch } = useQuery("cart", provider.getProducts);
   const { data: countryData, refetch: refetchCountry } = useQuery(
     "cart-country",
@@ -199,6 +201,18 @@ const CartComponentContent = ({ className }: { className: string }) => {
           )}
 
           <div className={"ics-mb-3 ics-flex ics-flex-col"}>
+            {isApplePayAvailable && products != null && products.length > 0 && (
+              <div className="ics-mb-1 ics-w-full">
+                <ApplePayButton items={products?.map(el => ({
+                  name: el.details?.name ?? "",
+                  id: el.productID,
+                  price: el.details?.price ?? 0,
+                  quantity: el.quantity,
+                  isDeliverable: el.details?.isDeliverable ?? false,
+                  metadata: el.metadata,
+                }))} />
+              </div>
+            )}
             <button
               onClick={continueToCheckout}
               disabled={
