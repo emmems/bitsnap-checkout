@@ -172,15 +172,16 @@ function ApplePayButtonComponent({ items, onClick }: Props) {
           return;
         }
 
-        clearCart();
-        session.completePayment({
-          status: ApplePaySession.STATUS_SUCCESS,
-        });
         if (result.redirectURL) {
           setTimeout(() => {
             open(result.redirectURL);
           }, 2000);
         }
+        session.completePayment({
+          status: result.isSuccess ? ApplePaySession.STATUS_SUCCESS : ApplePaySession.STATUS_FAILURE,
+        });
+
+        result.isSuccess && clearCart();
       } catch (e) {
         session.completePayment({
           status: ApplePaySession.STATUS_FAILURE,

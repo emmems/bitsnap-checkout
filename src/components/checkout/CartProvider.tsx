@@ -73,6 +73,7 @@ export interface CartMethods {
   }) => Promise<
     | Err
     | {
+      isSuccess: boolean;
       redirectURL?: string;
     }
   >;
@@ -574,6 +575,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     }): Promise<
       | Err
       | {
+        isSuccess: boolean;
         redirectURL?: string;
       }
     > {
@@ -631,6 +633,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         );
 
         return {
+          isSuccess: result.isSuccess,
           redirectURL: result.redirectUrl,
         };
       } catch (error) {
