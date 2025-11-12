@@ -26,6 +26,9 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.8.2
         version: 0.8.2
+      '@google-pay/button-react':
+        specifier: ^3.2.1
+        version: 3.2.1(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@inpost-pay/widget':
         specifier: ^2.2.0
         version: 2.2.0
@@ -286,6 +289,15 @@ packages:
   '@formkit/auto-animate@0.8.2':
     resolution: {integrity: sha512-SwPWfeRa5veb1hOIBMdzI+73te5puUBHmqqaF1Bu7FjvxlYSz/kJcZKSa9Cg60zL0uRNeJL2SbRxV6Jp6Q1nFQ==}
 
+  '@google-pay/button-react@3.2.1':
+    resolution: {integrity: sha512-PO4mmK4P43EteCsXmxMjiEpuSmTjsVvQxcTBxJ9HpBMrp9/q2UDDhjMFxp8+8QBDr1ZOguQIrlWDc4AIlXPMZw==}
+    engines: {node: '>=8.0.0'}
+    peerDependencies:
+      '@types/react': '>=16.0.0'
+      '@types/react-dom': '>=16.0.0'
+      react: '>=16.3.0'
+      react-dom: '>=16.3.0'
+
   '@inpost-pay/widget@2.2.0':
     resolution: {integrity: sha512-JPnBA3B35lqW7jdZ3lPT66MyabHFKhpu5HuK/6nx11AoQbyY3Eo2FrhR+flddvlwVAcVyOoCcSh9D0lyfz9UCA==}
 
@@ -430,6 +442,9 @@ packages:
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
+
+  '@types/googlepay@0.7.8':
+    resolution: {integrity: sha512-EHl7G7jIeit/Px/fi/Du/19SZDvqrRhy0DjJX40Vzs/97m3sro9mzVyAYNC0pfzpWGDY+zPjtTLEfhV+OYWUcQ==}
 
   '@types/react-dom@19.2.2':
     resolution: {integrity: sha512-9KQPoO6mZCi7jcIStSnlOWn2nEF3mNmyr3rIAsGnAbQKYbRLyqmeSc39EVgtxXVia+LMT8j3knZLAZAh+xLmrw==}
@@ -1283,6 +1298,14 @@ snapshots:
 
   '@formkit/auto-animate@0.8.2': {}
 
+  '@google-pay/button-react@3.2.1(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      '@types/googlepay': 0.7.8
+      '@types/react': 19.2.2
+      '@types/react-dom': 19.2.2(@types/react@19.2.2)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+
   '@inpost-pay/widget@2.2.0':
     dependencies:
       bowser: 2.12.1
@@ -1392,6 +1415,8 @@ snapshots:
   '@types/applepayjs@14.0.9': {}
 
   '@types/estree@1.0.6': {}
+
+  '@types/googlepay@0.7.8': {}
 
   '@types/react-dom@19.2.2(@types/react@19.2.2)':
     dependencies:

@@ -1,6 +1,6 @@
 {
   "name": "bitsnap-checkout",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "This is Bitsnap Checkout React library for easy integration with any website which is using React framework",
   "main": "index.ts",
   "type": "commonjs",
@@ -50,6 +50,7 @@
     "@connectrpc/connect-query": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.0",
     "@formkit/auto-animate": "^0.8.2",
+    "@google-pay/button-react": "^3.2.1",
     "@inpost-pay/widget": "^2.2.0",
     "@types/applepayjs": "^14.0.9",
     "apple-pay-button": "^1.2.1",

@@ -30,6 +30,7 @@ type CartProduct = {
 
 export interface CartMethods {
   checkIfApplePayIsAvailable(): Promise<boolean>;
+  checkIfGooglePayIsAvailable(): Promise<boolean>;
 
   addProduct(args: CartProduct): Promise<Err | void>;
 
@@ -310,6 +311,22 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         return false;
       }
     },
+    async checkIfGooglePayIsAvailable(): Promise<boolean> {
+      if (typeof window == "undefined" || typeof document == 'undefined') {
+        return false;
+      }
+
+      try {
+        const result = await PublicApiClient.get(HOST).isOneClickPaymentAvailable({
+          projectId: projectID,
+        });
+
+        return result.googlePay;
+      } catch (e) {
+        console.error("Error checking if Google Pay is available", e);
+        return false;
+      }
+    },
     async clearCart(): Promise<Err | void> {
       const empty = structuredClone(emptyCheckout);
       empty.country = getCheckout()?.country;
@@ -583,7 +600,8 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
                 quantity: el.quantity,
               })),
               couponCode: checkout.couponCode,
-              email: checkout.email,
+              email: args.shippingContact?.emailAddress ?? args.billingContact?.emailAddress ?? checkout.email ?? undefined,
+              phone: args.shippingContact?.phoneNumber ?? args.billingContact?.phoneNumber ?? undefined,
               selectedDeliveryMethod: checkout.selectedDeliveryMethod,
               postCode: checkout.postalCode,
               projectId: projectID,
