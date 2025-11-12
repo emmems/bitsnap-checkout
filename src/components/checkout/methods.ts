@@ -129,7 +129,7 @@ export async function createCheckout(
   };
 }
 
-function getReferenceIfPossible(): string | undefined {
+export function getReferenceIfPossible(): string | undefined {
   if (typeof localStorage == "undefined") {
     return undefined;
   }

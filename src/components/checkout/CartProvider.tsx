@@ -16,7 +16,7 @@ import { buildURL } from "./helper.methods";
 import { Err, isErr } from "./lib/err";
 import { round } from "./lib/round.number";
 import { LinkRequest } from "./link.request.schema";
-import { createPaymentURL, injectReferenceToRequestIfNeeded } from "./methods";
+import { createPaymentURL, getReferenceIfPossible, injectReferenceToRequestIfNeeded } from "./methods";
 import { SingleProduct } from "./product.details.model";
 import { animateValue } from "framer-motion";
 
@@ -598,6 +598,13 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
           shippingName += ' ' + args.billingContact?.familyName;
         }
 
+        let metadata: Record<string, string> = {};
+
+        const ref = getReferenceIfPossible();
+        if (ref != null) {
+          metadata["ref"] = ref;
+        }
+
         const result = await PublicApiClient.get(HOST).applePayAuthorizePayment(
           {
             paymentData: JSON.stringify(args.token.paymentData),
@@ -629,6 +636,7 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
               country: args.billingContact?.countryCode ?? "",
               zipCode: args.billingContact?.postalCode ?? "",
             }),
+            metadata: Object.keys(metadata).length > 0 ? JSON.stringify(metadata) : undefined,
           },
         );
 
