@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "react-query";
 import { isErr } from './lib/err';
 
 type Props = {
+    test?: boolean;
     buttonSizeMode?: 'static' | 'fill';
     buttonColor?: 'white' | 'black';
     style?: {
@@ -12,7 +13,7 @@ type Props = {
     items: { name: string; id: string; price: number; quantity: number; isDeliverable?: boolean; metadata?: { [key: string]: string | undefined } }[];
 };
 
-function GooglePayButtonComponent({ items, style, buttonColor, buttonSizeMode }: Props) {
+function GooglePayButtonComponent({ items, style, buttonColor, buttonSizeMode, test }: Props) {
     const {
         getGooglePayConfiguration,
         completeGooglePayPayment,
@@ -43,7 +44,7 @@ function GooglePayButtonComponent({ items, style, buttonColor, buttonSizeMode }:
                 buttonColor={buttonColor}
                 style={style}
                 existingPaymentMethodRequired={true}
-                environment='TEST'
+                environment={test === true ? 'TEST' : 'PRODUCTION'}
                 onPaymentDataChanged={async (paymentData) => {
                     console.log('payment data changed', paymentData);
                     if (paymentData.shippingAddress?.postalCode != null) {
