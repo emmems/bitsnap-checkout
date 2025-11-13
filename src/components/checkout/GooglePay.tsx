@@ -1,6 +1,7 @@
 import GooglePayButton from '@google-pay/button-react';
 import CartProvider, { getProjectID, useCartProvider } from "./CartProvider";
 import { useMutation, useQuery } from "react-query";
+import { isErr } from './lib/err';
 
 type Props = {
     buttonSizeMode?: 'static' | 'fill';
@@ -71,12 +72,22 @@ function GooglePayButtonComponent({ items, style, buttonColor, buttonSizeMode }:
                 }}
                 paymentRequest={googlePayConfiguration.config}
                 onLoadPaymentData={async (paymentRequest) => {
+                    try {
+                        const result = await completeGooglePayPaymentAsync({
+                            paymentData: paymentRequest
+                        });
+                        if (isErr(result)) {
+                            console.log("apple pay error", result);
+                            return;
+                        }
 
-                    const result = await completeGooglePayPaymentAsync({
-                        paymentData: paymentRequest
-                    });
-
-                    console.log('load payment data', paymentRequest);
+                        result.isSuccess && clearCart();
+                        if (result.redirectURL) {
+                            open(result.redirectURL, "_self");
+                        }
+                    } catch (e) {
+                        console.warn("error completing google pay payment", e);
+                    }
                 }}
             />
             {isLoading ? 'Ładowanie...' : null}
