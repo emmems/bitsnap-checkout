@@ -8,7 +8,7 @@ import { formatCurrency } from "./lib/round.number";
 import LoadingIndicator from "./LoadingIndicator";
 import SingleProduct from "./SingleProduct";
 import { Skeleton } from "./Skeleton";
-import { ApplePayButton } from "..";
+import { ApplePayButton, GooglePayButton } from "..";
 
 const CartComponentContent = ({ className }: { className: string }) => {
   const provider = useCartProvider();
@@ -202,8 +202,20 @@ const CartComponentContent = ({ className }: { className: string }) => {
 
           <div className={"ics-mb-3 ics-flex ics-flex-col"}>
             {isApplePayAvailable && products != null && products.length > 0 && (
-              <div className="ics-mb-1 ics-w-full">
+              <div className="ics-w-full ics-px-2">
                 <ApplePayButton colorType="white" style={{ width: '100%' }} items={products?.map(el => ({
+                  name: el.details?.name ?? "",
+                  id: el.productID,
+                  price: el.details?.price ?? 0,
+                  quantity: el.quantity,
+                  isDeliverable: el.details?.isDeliverable ?? false,
+                  metadata: el.metadata,
+                }))} />
+              </div>
+            )}
+            {products != null && products.length > 0 && (
+              <div className="ics-w-full ics-px-2">
+                <GooglePayButton buttonSizeMode="fill" buttonColor="white" style={{ width: '100%' }} items={products?.map(el => ({
                   name: el.details?.name ?? "",
                   id: el.productID,
                   price: el.details?.price ?? 0,

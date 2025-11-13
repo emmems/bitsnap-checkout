@@ -7,6 +7,7 @@ import {
 } from "src/gen/proto/common/v1/address_pb";
 import {
   GetPreOrderDetailsRequestSchema,
+  OneClickAuthorizePaymentRequest_Gateway,
   PreOrderItemSchema,
 } from "src/gen/proto/public/v1/public_api_pb";
 import { PublicApiClient } from "src/public.api.client";
@@ -14,11 +15,11 @@ import zod from "zod";
 import { HOST, setCustomHost } from "./constants";
 import { buildURL } from "./helper.methods";
 import { Err, isErr } from "./lib/err";
-import { round } from "./lib/round.number";
+import { formatCurrency, round } from "./lib/round.number";
 import { LinkRequest } from "./link.request.schema";
 import { createPaymentURL, getReferenceIfPossible, injectReferenceToRequestIfNeeded } from "./methods";
 import { SingleProduct } from "./product.details.model";
-import { animateValue } from "framer-motion";
+import { mapGooglePayConfiguration } from "./google.pay.mapper";
 
 export const MARKETING_AGREEMENT_ID = "__m_a";
 
@@ -30,7 +31,12 @@ type CartProduct = {
 
 export interface CartMethods {
   checkIfApplePayIsAvailable(): Promise<boolean>;
-  checkIfGooglePayIsAvailable(): Promise<boolean>;
+  getGooglePayConfiguration(args: { items: CartProduct[] }): Promise<{
+    isAvailable: true;
+    config: google.payments.api.PaymentDataRequest;
+  } | {
+    isAvailable: false;
+  }>;
 
   addProduct(args: CartProduct): Promise<Err | void>;
 
@@ -77,6 +83,12 @@ export interface CartMethods {
       redirectURL?: string;
     }
   >;
+  completeGooglePayPayment: (args: {
+    paymentData: google.payments.api.PaymentData
+  }) => Promise<Err | {
+    isSuccess: boolean;
+    redirectURL?: string;
+  }>;
 
   justRedirectToPayment: (args: {
     email?: string;
@@ -215,6 +227,13 @@ export const useCartProvider = () => {
 
 export default CartProvider;
 
+const googlePayConfigSchema = zod.object({
+  isAvailable: zod.boolean(),
+  merchantId: zod.string(),
+  merchantName: zod.string(),
+  gateway: zod.string(),
+  gatewayId: zod.string(),
+});
 const checkoutSchema = zod.object({
   country: zod.string().optional(),
   couponCode: zod.string().optional(),
@@ -231,7 +250,9 @@ const checkoutSchema = zod.object({
       }),
     )
     .optional(),
+  googlePayConfig: googlePayConfigSchema.optional(),
 });
+export type GooglePayConfig = zod.infer<typeof googlePayConfigSchema>;
 const emptyCheckout: Checkout = {
   country: undefined,
   couponCode: undefined,
@@ -239,8 +260,9 @@ const emptyCheckout: Checkout = {
   selectedDeliveryMethod: undefined,
   postalCode: undefined,
   products: [],
+  googlePayConfig: undefined,
 };
-type Checkout = zod.infer<typeof checkoutSchema>;
+export type Checkout = zod.infer<typeof checkoutSchema>;
 
 const checkoutKey = "checkout";
 
@@ -312,20 +334,87 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         return false;
       }
     },
-    async checkIfGooglePayIsAvailable(): Promise<boolean> {
+    async getGooglePayConfiguration(args: { items: CartProduct[] }): Promise<{
+      isAvailable: true;
+      config: google.payments.api.PaymentDataRequest;
+    } | {
+      isAvailable: false;
+    }> {
       if (typeof window == "undefined" || typeof document == 'undefined') {
-        return false;
+        return {
+          isAvailable: false,
+        }
       }
 
       try {
-        const result = await PublicApiClient.get(HOST).isOneClickPaymentAvailable({
-          projectId: projectID,
-        });
+        const googlePayConfig = await resolveGooglePayConfiguration(projectID);
+        if (googlePayConfig?.isAvailable != true) {
+          return {
+            isAvailable: false,
+          }
+        }
 
-        return result.googlePay;
+        const checkout = getCheckout();
+        if (checkout == null) {
+          console.log('checkout is null');
+          return {
+            isAvailable: false,
+          }
+        }
+        if (args && args.items != null && args.items.length > 0) {
+          if (checkout.products) {
+            removeProductFromCheckout(checkout.products.map(el => el.productID));
+          }
+          addProducts(args.items);
+        }
+
+        const products = await getProducts(projectID);
+
+        if (isErr(products)) {
+          return {
+            isAvailable: false,
+          };
+        }
+        const result = await PublicApiClient.get(HOST).getPreOrderDetails({
+          items: products.map((el) =>
+            create(PreOrderItemSchema, { id: el.productID, quantity: el.quantity }),
+          ),
+          projectId: projectID,
+          // we can detect 5 the closest inpost pickup point based on shipping address.
+          postCode: checkout.postalCode,
+          couponCode: checkout.couponCode,
+          countryCode: checkout.country,
+          selectedDeliveryMethod: checkout.selectedDeliveryMethod,
+        });
+        if (result.totalAmount == null) {
+          return {
+            isAvailable: false,
+          }
+        }
+        const cartRequiresShipping = products.find(el => el.details?.isDeliverable == true) != null;
+
+        const mappedPaymentRequest = await mapGooglePayConfiguration({
+          items: products,
+          googlePayConfig: googlePayConfig,
+          checkout: checkout,
+          cartRequiresShipping: cartRequiresShipping,
+          result: result,
+        });
+        if (mappedPaymentRequest == null) {
+          return {
+            isAvailable: false,
+          }
+        }
+
+        return {
+          isAvailable: true,
+          config: mappedPaymentRequest,
+        }
       } catch (e) {
-        console.error("Error checking if Google Pay is available", e);
-        return false;
+        console.error("Error resolving Google Pay configuration", e);
+        return {
+          isAvailable: false,
+        }
       }
     },
     async clearCart(): Promise<Err | void> {
@@ -388,7 +477,9 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
         id: string;
         productID: string;
         quantity: number;
-        metadata?: { [p: string]: string | undefined };
+        metadata?: {
+          [p: string]: string | undefined
+        };
         details?: SingleProduct;
       }[]
     > {
@@ -605,8 +696,9 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
           metadata["ref"] = ref;
         }
 
-        const result = await PublicApiClient.get(HOST).applePayAuthorizePayment(
+        const result = await PublicApiClient.get(HOST).authorizeOneClickPayment(
           {
+            gateway: OneClickAuthorizePaymentRequest_Gateway.APPLE_PAY,
             paymentData: JSON.stringify(args.token.paymentData),
             paymentMethod: JSON.stringify(args.token.paymentMethod),
             transactionIdentifier: args.token.transactionIdentifier,
@@ -647,6 +739,83 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
       } catch (error) {
         console.error(error);
         return Err("Failed to authorize payment");
+      }
+    },
+
+    async completeGooglePayPayment(args: {
+      paymentData: google.payments.api.PaymentData
+    }): Promise<Err | {
+      isSuccess: boolean;
+      redirectURL?: string;
+    }> {
+      const checkout = getCheckout();
+      if (checkout == null) {
+        return Err("Checkout not found");
+      }
+
+      const products = await getProducts(projectID);
+
+      if (isErr(products)) {
+        return products;
+      }
+
+      try {
+        let shippingName = args.paymentData.shippingAddress?.name;
+
+        let metadata: Record<string, string> = {};
+
+        const ref = getReferenceIfPossible();
+        if (ref != null) {
+          metadata["ref"] = ref;
+        }
+
+        const result = await PublicApiClient.get(HOST).authorizeOneClickPayment(
+          {
+            gateway: OneClickAuthorizePaymentRequest_Gateway.GOOGLE_PAY,
+            paymentData: args.paymentData.paymentMethodData.tokenizationData.token,
+            paymentMethod: args.paymentData.paymentMethodData.type,
+            transactionIdentifier: '',
+            order: create(GetPreOrderDetailsRequestSchema, {
+              items: products.map((el) => ({
+                id: el.productID,
+                quantity: el.quantity,
+              })),
+              couponCode: checkout.couponCode,
+              email: args.paymentData.email ?? undefined,
+              phone: args.paymentData.shippingAddress?.phoneNumber ?? undefined,
+              selectedDeliveryMethod: args.paymentData.shippingOptionData?.id ?? checkout.selectedDeliveryMethod,
+              postCode: args.paymentData.shippingAddress?.postalCode,
+              projectId: projectID,
+            }),
+            shippingAddress: create(AddressSchema, {
+              line1: args.paymentData.shippingAddress?.address1 ?? "",
+              city: args.paymentData.shippingAddress?.locality ?? "",
+              country: args.paymentData.shippingAddress?.countryCode ?? "",
+              zipCode: args.paymentData.shippingAddress?.postalCode ?? "",
+              name: shippingName,
+            }),
+            billingAddress: create(BillingAddressSchema, {
+              name: args.paymentData.paymentMethodData.info?.billingAddress?.name,
+              line1: args.paymentData.paymentMethodData.info?.billingAddress?.address1 ?? "",
+              city: args.paymentData.paymentMethodData.info?.billingAddress?.locality ?? "",
+              country: args.paymentData.paymentMethodData.info?.billingAddress?.countryCode ?? "",
+              zipCode: args.paymentData.paymentMethodData.info?.billingAddress?.postalCode ?? "",
+            }),
+            metadata: Object.keys(metadata).length > 0 ? JSON.stringify(metadata) : undefined,
+          },
+        );
+
+        return {
+          isSuccess: result.isSuccess,
+          redirectURL: result.redirectUrl,
+        };
+      } catch (error) {
+        console.error(error);
+        return Err("Failed to authorize payment");
+      }
+
+      return {
+        isSuccess: true,
       }
     },
 
@@ -748,6 +917,34 @@ export const getCheckoutMethods: (projectID: string) => CartMethods = (
     },
   };
 };
+
+async function resolveGooglePayConfiguration(projectID: string) {
+  const checkout = getCheckout();
+  if (checkout.googlePayConfig?.isAvailable != true) {
+    const result = await PublicApiClient.get(HOST).isOneClickPaymentAvailable({
+      projectId: projectID,
+    });
+    if (result.googlePay == true && result.googlePayConfig != null) {
+      checkout.googlePayConfig = {
+        isAvailable: true,
+        gateway: result.googlePayConfig.gateway,
+        gatewayId: result.googlePayConfig.gatewayMerchantId,
+        merchantName: result.googlePayConfig.merchantName,
+        merchantId: result.googlePayConfig.merchantId,
+      }
+    } else {
+      checkout.googlePayConfig = {
+        isAvailable: false,
+        gateway: '',
+        gatewayId: '',
+        merchantName: '',
+        merchantId: '',
+      }
+    }
+  }
+  saveCheckout(checkout);
+  return checkout.googlePayConfig;
+}
 
 function resolveProductDetailsFromSingleProduct(
   id: string,

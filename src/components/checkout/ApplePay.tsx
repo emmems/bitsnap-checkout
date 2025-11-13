@@ -178,6 +178,7 @@ function ApplePayButtonComponent({ style, buttonType, colorType, items, onClick 
         });
       } catch (error) {
         console.log("coupon code changed error", error);
+        session.abort();
       }
     };
 
